@@ -1,29 +1,36 @@
 local socket = require("socket")
+local lanes = require("lanes")
 
 -- create a TCP socket and bind it to the local host
-local server = assert(socket.bind("*", 42242))
-
--- find out which port the OS chose for us
+local server = assert(socket.bind("*", 8080))
 local ip, port = server:getsockname()
 
--- print a message informing what's up
-print("Please telnet to localhost on port " .. port)
-print("After connecting, you have 10s to enter a line to be echoed")
+print("Connected to localhost on port "..port)
 
--- loop forever waiting for clients
+-- launch the BizHawk emulator in seperate thread
+lanes.gen("os", function()
+    os.execute("cd C:/BizHawk && EmuHawk.exe --socket_ip=127.0.0.1 --socket_port="..port.." --Lua=C:/Users/Conno/VSCodeProjects/birds-eye/src/bizhawkClient.lua") 
+  end
+)()
+
+-- main loop
 while true do
   -- wait for a connection from any client
-  local client = server:accept()
-
-  -- make sure we don't block waiting for this client's line
-  client:settimeout(10)
+  server:settimeout(10)
+  local client, acceptErr = server:accept()
+  if acceptErr then
+    print("Session timed out: No client connected after 10 seconds.")
+    break
+  end
 
   -- receive the line
-  local line, err = client:receive()
+  local line, recvErr = client:receive()
 
   -- if there was no error, send it back to the client
-  if not err then client:send(line .. "\n") end
+  if not recvErr then client:send(line .. "\n") end
 
   -- done with client, close the object
   client:close()
 end
+
+server:close()

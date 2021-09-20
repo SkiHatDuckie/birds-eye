@@ -1,5 +1,5 @@
 local socket = require("socket")
-local host, port = "127.0.0.1", 42242
+local host, port = "127.0.0.1", 8080
 
 -- create a TCP socket
 local tcp = assert(socket.tcp())
@@ -11,7 +11,7 @@ tcp:connect(host, port);
 tcp:send("hello world\n");
 
 while true do
-    -- check connection status
+    -- check for connection status / messages
     local s, status, partial = tcp:receive()
     print(s or partial)
     if status == "closed" then break end
