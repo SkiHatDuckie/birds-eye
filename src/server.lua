@@ -8,8 +8,10 @@ local ip, port = server:getsockname()
 print("Connected to localhost on port "..port)
 
 -- launch the BizHawk emulator in seperate thread
-lanes.gen("os", function()
-    os.execute("cd C:/BizHawk && EmuHawk.exe --socket_ip=127.0.0.1 --socket_port="..port.." --Lua=C:/Users/Conno/VSCodeProjects/birds-eye/src/bizhawkClient.lua") 
+lanes.gen("os",
+  function()
+    local hookPath = "C:/Users/Conno/VSCodeProjects/birds-eye/src/hook.lua"
+    os.execute("cd C:/BizHawk-2.6.2 && EmuHawk.exe --socket_ip=127.0.0.1 --socket_port="..port.." --Lua="..hookPath)
   end
 )()
 
@@ -24,6 +26,7 @@ while true do
   end
 
   -- receive the line
+  client:settimeout(10)
   local line, recvErr = client:receive()
 
   -- if there was no error, send it back to the client
