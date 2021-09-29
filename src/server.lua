@@ -1,5 +1,4 @@
 -- socket timeout values are in seconds
-
 local socket = require("socket")
 local lanes = require("lanes")
 
@@ -7,20 +6,9 @@ local lanes = require("lanes")
 local server = assert(socket.bind("*", 8080))
 local ip, port = server:getsockname()
 
+-- hook object and socket status
 local hook = nil
 local socket_err = nil
-
-
--- wait for a connection from hook
-local connect = function()
-  server:settimeout(10)
-  hook, socket_err = server:accept()
-  if socket_err then
-    print("Session timed out: No client connected after 10 seconds.")
-  else
-    print("Hook connected!")
-  end
-end
 
 
 -- check for console input in seperate thread to avoid interferance w/ sockets
@@ -32,16 +20,6 @@ local input_thread = lanes.gen(
   end
 )
 local check_input = input_thread()
-
-
--- launch the BizHawk emulator in seperate thread
-local emuhawk_thread = lanes.gen(
-  "os",
-  function()
-    local hook_path = "C:/Users/Conno/VSCodeProjects/birds-eye/src/hook.lua"
-    os.execute("cd C:/BizHawk-2.6.2 && EmuHawk.exe --socket_ip=127.0.0.1 --socket_port="..port.." --Lua="..hook_path)
-  end
-)
 
 
 -- startup
@@ -60,7 +38,6 @@ while true do
       get ip:   get socket ip
       get port: get socket port
       help:     display commands list
-      launch:   launch emulator and establish connection with hook
       quit:     disconnect socket and terminate process
     ]]--
     if input == "get ip" then
@@ -76,19 +53,9 @@ while true do
 get ip:   get socket ip
 get port: get socket port
 help:     display commands list
-launch:   launch emulator and establish connection with hook
 quit:     disconnect socket and terminate process
 ]]
       )
-
-    elseif input == "launch" then
-      -- launch emulator
-      print("Launching Emuhawk...")
-      emuhawk_thread()
-      -- wait for hook to connect
-      print("Waiting for connection...")
-      connect()
-      if socket_err then break end
 
     elseif input == "quit" then
       break
@@ -103,6 +70,3 @@ quit:     disconnect socket and terminate process
     check_input = input_thread()
   end
 end
-
-if hook then hook:close() end
-server:close()
