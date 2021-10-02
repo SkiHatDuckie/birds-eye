@@ -1,37 +1,34 @@
--- socket timeout values are in seconds
 local socket = require("socket")
 local lanes = require("lanes")
 
--- create a TCP socket and bind it to the local host
-local server = assert(socket.bind("*", 8080))
-local ip, port = server:getsockname()
+local host, port = "localhost", 8080
+local client = assert(socket.tcp())
 
--- hook object and socket status
-local hook = nil
-local socket_err = nil
+-- connect to hook
+client:connect(host, port);
 
 
 -- check for console input in seperate thread to avoid interferance w/ sockets
-local input_thread = lanes.gen(
+local checkInput = lanes.gen(
   "io",
   function()
     local input = io.read("*l")
     return input
   end
 )
-local check_input = input_thread()
+local input_thread = checkInput()
 
 
--- startup
+-- cui startup text
 print("=== Birds-Eye ===")
 io.write("> ")
 
 -- main loop
 while true do
   -- check for user input is ready to be processed
-  if check_input.status == "done" then
+  if input_thread.status == "done" then
     -- get input from thread
-    local input = check_input[1]
+    local input = input_thread[1]
 
     --[[
       === Commands List ===
@@ -41,7 +38,7 @@ while true do
       quit:     disconnect socket and terminate process
     ]]--
     if input == "get ip" then
-      print(ip)
+      print(host)
 
     elseif input == "get port" then
       print(port)
@@ -67,6 +64,22 @@ quit:     disconnect socket and terminate process
     io.write("> ")
 
     -- regenerate thread to check for input again
-    check_input = input_thread()
+    input_thread = checkInput()
+  end
+
+  -- socket stuff here
+  -- send message to hook
+  client:send("hello world\n");
+
+  -- receive message from hook
+  client:settimeout(3)
+  local hook_msg, socket_err = client:receive()
+  if hook_msg ~= nil then
+    io.write("\n", hook_msg)
+  elseif socket_err == "timeout" then
+    io.write("\n", "No message received from hook 3 seconds")
   end
 end
+
+-- close client when finished
+client:close()
