@@ -39,7 +39,8 @@ while true do
         if socket_err == "timeout" then
             print("No message from client after 3 seconds")
             socket_err = nil
-        else
+
+        elseif client_msg then
             -- send message back to client
             client:send(client_msg.."\n")
         end

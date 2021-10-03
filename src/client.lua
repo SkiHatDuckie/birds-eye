@@ -4,6 +4,7 @@ local lanes = require("lanes")
 local host, port = "localhost", 8080
 local client = assert(socket.tcp())
 local status = "not connected"
+local processing_input = false
 
 
 -- connect to hook
@@ -46,15 +47,17 @@ while true do
       if status ~= "connected" then
         connect()
         status = "connecting"
+        processing_input = true
+
       else
-        print("Already connected to hook")
+        io.write("Already connected to hook")
       end
 
     elseif input == "get ip" then
-      print(host)
+      io.write(host)
 
     elseif input == "get port" then
-      print(port)
+      io.write(port)
 
     elseif input == "help" then
       io.write(
@@ -72,18 +75,20 @@ quit:     disconnect socket and terminate process
       break
 
     else
-      print("Unknown command \""..input.."\": type \"help\" for a list of commands")
+      io.write("Unknown command \""..input.."\": type \"help\" for a list of commands")
     end
-
-    io.write("> ")
 
     -- regenerate thread to check for input again
     input_thread = checkInput()
+
+    -- start new line
+    if not processing_input then
+      io.write("> ")
+    end
   end
 
-
+  -- say hello to hook!
   if status == "connecting" then
-    -- say hello to hook!
     client:send("hello!\n");
     status = "connected"
   end
@@ -94,10 +99,12 @@ quit:     disconnect socket and terminate process
     local hook_msg, socket_err = client:receive()
 
     if hook_msg ~= nil then
-      io.write("\n", "HOOK: ", hook_msg)
+      io.write("HOOK: ", hook_msg, "\n")
+      io.write("> ")
+      processing_input = false
     end
   end
 end
 
 -- close client when finished
-client:close()
+if client then client:close() end
