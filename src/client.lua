@@ -3,9 +3,13 @@ local lanes = require("lanes")
 
 local host, port = "localhost", 8080
 local client = assert(socket.tcp())
+local status = "not connected"
+
 
 -- connect to hook
-client:connect(host, port);
+local function connect()
+  client:connect(host, port);
+end
 
 
 -- check for console input in seperate thread to avoid interferance w/ sockets
@@ -32,12 +36,21 @@ while true do
 
     --[[
       === Commands List ===
+      connect:  connect to hook
       get ip:   get socket ip
       get port: get socket port
       help:     display commands list
       quit:     disconnect socket and terminate process
     ]]--
-    if input == "get ip" then
+    if input == "connect" then
+      if status ~= "connected" then
+        connect()
+        status = "connecting"
+      else
+        print("Already connected to hook")
+      end
+
+    elseif input == "get ip" then
       print(host)
 
     elseif input == "get port" then
@@ -47,6 +60,7 @@ while true do
       io.write(
 [[
 === Commands List ===
+connect:  connect to hook
 get ip:   get socket ip
 get port: get socket port
 help:     display commands list
@@ -67,17 +81,21 @@ quit:     disconnect socket and terminate process
     input_thread = checkInput()
   end
 
-  -- socket stuff here
-  -- send message to hook
-  client:send("hello world\n");
 
-  -- receive message from hook
-  client:settimeout(3)
-  local hook_msg, socket_err = client:receive()
-  if hook_msg ~= nil then
-    io.write("\n", hook_msg)
-  elseif socket_err == "timeout" then
-    io.write("\n", "No message received from hook 3 seconds")
+  if status == "connecting" then
+    -- say hello to hook!
+    client:send("hello!\n");
+    status = "connected"
+  end
+
+  if status == "connected" then
+    -- receive message from hook
+    client:settimeout(3)
+    local hook_msg, socket_err = client:receive()
+
+    if hook_msg ~= nil then
+      io.write("\n", "HOOK: ", hook_msg)
+    end
   end
 end
 
