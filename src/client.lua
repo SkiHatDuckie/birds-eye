@@ -25,7 +25,7 @@ local input_thread = checkInput()
 
 
 -- cui startup text
-print("=== Birds-Eye ===")
+io.write("=== Birds-Eye ===\n")
 io.write("> ")
 
 -- main loop
@@ -50,7 +50,7 @@ while true do
         processing_input = true
 
       else
-        io.write("Already connected to hook")
+        io.write("Already connected to hook\n")
       end
 
     elseif input == "get ip" then
@@ -75,7 +75,7 @@ quit:     disconnect socket and terminate process
       break
 
     else
-      io.write("Unknown command \""..input.."\": type \"help\" for a list of commands")
+      io.write("Unknown command \""..input.."\": type \"help\" for a list of commands\n")
     end
 
     -- regenerate thread to check for input again
@@ -89,13 +89,13 @@ quit:     disconnect socket and terminate process
 
   -- say hello to hook!
   if status == "connecting" then
-    client:send("hello!\n");
+    client:send("hello!\n")
     status = "connected"
   end
 
   if status == "connected" then
     -- receive message from hook
-    client:settimeout(3)
+    client:settimeout(1)
     local hook_msg, socket_err = client:receive()
 
     if hook_msg ~= nil then
@@ -103,6 +103,9 @@ quit:     disconnect socket and terminate process
       io.write("> ")
       processing_input = false
     end
+
+    -- request emulator state
+    client:send("state?\n")
   end
 end
 

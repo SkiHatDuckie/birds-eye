@@ -13,7 +13,7 @@ local client_msg = ""
 
 -- accept connection from client (if any)
 local function findConnections()
-    server:settimeout(3)
+    server:settimeout(1)
     client, socket_err = server:accept()
 
     if socket_err == "timeout" then
@@ -32,7 +32,7 @@ while true do
 
     -- receive message from client
     if client then
-        client:settimeout(3)
+        client:settimeout(1)
         client_msg, socket_err = client:receive()
         print(client_msg)
 
@@ -40,11 +40,17 @@ while true do
             print("No message from client after 3 seconds")
             socket_err = nil
 
-        elseif client_msg then
+        elseif client_msg == "hello!" then
             -- send message back to client
             client:send(client_msg.."\n")
+        elseif client_msg == "state?" then
+            -- return emulator state to client
+            client:send(emu.framecount().."\n")
         end
     end
+
+    -- next frame!
+    emu.frameadvance()
 end
 
 -- close server and client object when finished
