@@ -3,7 +3,6 @@ local socket = require("socket")
 
 -- create a TCP socket and bind it to the local host
 local server = assert(socket.bind("*", 8080))
--- local ip, port = server:getsockname()
 
 -- hook object and socket status
 local client = nil
@@ -34,7 +33,6 @@ while true do
     if client then
         client:settimeout(1)
         client_msg, socket_err = client:receive()
-        print(client_msg)
 
         if socket_err == "timeout" then
             print("No message from client after 3 seconds")
@@ -43,6 +41,7 @@ while true do
         elseif client_msg == "hello!" then
             -- send message back to client
             client:send(client_msg.."\n")
+
         elseif client_msg == "state?" then
             -- return emulator state to client
             client:send(emu.framecount().."\n")

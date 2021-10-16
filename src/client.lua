@@ -4,12 +4,16 @@ local lanes = require("lanes")
 local host, port = "localhost", 8080
 local client = assert(socket.tcp())
 local status = "not connected"
+
 local processing_input = false
 
 
 -- connect to hook
 local function connect()
+  print("Connecting to hook...")
   client:connect(host, port);
+  status = "connecting"
+  processing_input = true
 end
 
 
@@ -24,43 +28,31 @@ local checkInput = lanes.gen(
 local input_thread = checkInput()
 
 
--- cui startup text
-io.write("=== Birds-Eye ===\n")
-io.write("> ")
+-- process user input
+-----------------------------------------------------
+-- === Commands List ===
+-- connect:  connect to hook
+-- get ip:   get socket ip
+-- get port: get socket port
+-- help:     display commands list
+-- quit:     disconnect socket and terminate process
+-----------------------------------------------------
+local function processInput(input)
+  if input == "connect" then
+    if status ~= "connected" then
+      connect()
+    else
+      print("Already connected to hook")
+    end
 
--- main loop
-while true do
-  -- check for user input is ready to be processed
-  if input_thread.status == "done" then
-    -- get input from thread
-    local input = input_thread[1]
+  elseif input == "get ip" then
+    print(host)
 
-    --[[
-      === Commands List ===
-      connect:  connect to hook
-      get ip:   get socket ip
-      get port: get socket port
-      help:     display commands list
-      quit:     disconnect socket and terminate process
-    ]]--
-    if input == "connect" then
-      if status ~= "connected" then
-        connect()
-        status = "connecting"
-        processing_input = true
+  elseif input == "get port" then
+    print(port)
 
-      else
-        io.write("Already connected to hook\n")
-      end
-
-    elseif input == "get ip" then
-      io.write(host)
-
-    elseif input == "get port" then
-      io.write(port)
-
-    elseif input == "help" then
-      io.write(
+  elseif input == "help" then
+    io.write(
 [[
 === Commands List ===
 connect:  connect to hook
@@ -69,43 +61,56 @@ get port: get socket port
 help:     display commands list
 quit:     disconnect socket and terminate process
 ]]
-      )
+    )
 
-    elseif input == "quit" then
-      break
+  elseif input == "quit" then
+    return "break"
 
-    else
-      io.write("Unknown command \""..input.."\": type \"help\" for a list of commands\n")
-    end
+  else
+    print("Unknown command \""..input.."\": type \"help\" for a list of commands")
+  end
+end
+
+
+-- cui startup text
+print("=== Birds-Eye ===")
+io.write("> ")
+
+-- main loop
+while true do
+  -- check for user input is ready to be processed
+  if input_thread.status == "done" and not processing_input then
+    -- get input from thread
+    local output = processInput(input_thread[1])
+    if output == "break" then break end
 
     -- regenerate thread to check for input again
     input_thread = checkInput()
 
     -- start new line
-    if not processing_input then
-      io.write("> ")
-    end
+    if not processing_input then io.write("> ") end
   end
 
-  -- say hello to hook!
-  if status == "connecting" then
-    client:send("hello!\n")
-    status = "connected"
-  end
-
-  if status == "connected" then
+  if status == "connected" or status == "connecting" then
     -- receive message from hook
     client:settimeout(1)
     local hook_msg, socket_err = client:receive()
 
-    if hook_msg ~= nil then
-      io.write("HOOK: ", hook_msg, "\n")
+    if hook_msg == "hello!" then
+      print("Connected!")
       io.write("> ")
+      status = "connected"
       processing_input = false
+    else
+      print(hook_msg)  -- TODO: store received framecount data in table
     end
 
-    -- request emulator state
-    client:send("state?\n")
+    -- send messages to hook
+    if status ~= "connecting" then
+      client:send("state?\n")
+    else
+      client:send("hello!\n")
+    end
   end
 end
 
