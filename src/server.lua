@@ -7,28 +7,28 @@ local host, port = "localhost", 8080
 
 -- hook object and socket status
 local client = nil
-local socket_err = nil
-local client_msg = ""
+local socketErr = nil
+local clientMsg = ""
 local status = "not connected"
 
 -- emulator status
-local emulator_launched = false
+local emulatorLaunched = false
 
 -- cui status
-local processing_input = false
+local processingInput = false
 
 
 -- accept connection from client (if any)
 local function findConnections()
     server:settimeout(3)
-    client, socket_err = server:accept()
+    client, socketErr = server:accept()
 
-    if socket_err == "timeout" then
+    if socketErr == "timeout" then
         print("Could not find hook after 3 seconds")
-        socket_err = nil
+        socketErr = nil
     else
         status = "connected"
-        processing_input = false
+        processingInput = false
     end
 end
 
@@ -37,10 +37,10 @@ end
 local launchEmuhawk = lanes.gen(
     "os",
     function()
-        local hook_path = "C:/Users/Conno/VSCodeProjects/birds-eye/src/hook.lua"
-        local socket_ip = " --socket_ip=127.0.0.1"
-        local socket_port = " --socket_port="..port
-        os.execute("cd C:/BizHawk-2.6.2 && EmuHawk.exe"..socket_ip..socket_port.." --Lua="..hook_path)
+        local hookPath = "C:/Users/Conno/VSCodeProjects/birds-eye/src/hook.lua"
+        local socketIp = " --socket_ip=127.0.0.1"
+        local socketPort = " --socket_port="..port
+        os.execute("cd C:/BizHawk-2.6.2 && EmuHawk.exe"..socketIp..socketPort.." --Lua="..hookPath)
     end
 )
 
@@ -53,7 +53,7 @@ local checkInput = lanes.gen(
     return input
   end
 )
-local input_thread = checkInput()
+local inputThread = checkInput()
 
 
 -- process user input
@@ -70,7 +70,7 @@ local function processInput(input)
     if input == "connect" then
         if status ~= "connected" then
             status = "connecting"
-            processing_input = true
+            processingInput = true
 
         else
             print("Already connected to hook")
@@ -96,7 +96,7 @@ quit:     disconnect socket and terminate process
         )
 
     elseif input == "launch" then
-        if not emulator_launched then
+        if not emulatorLaunched then
             launchEmuhawk()
 
         else
@@ -119,17 +119,17 @@ io.write("> ")
 --  main loop
 while true do
     -- check for user input is ready to be processed
-    if input_thread.status == "done" and not processing_input then
+    if inputThread.status == "done" and not processingInput then
         -- get input from thread
-        local output = processInput(input_thread[1])
+        local output = processInput(inputThread[1])
 
         if output == "break" then break end
 
         -- regenerate thread to check for input again
-        input_thread = checkInput()
+        inputThread = checkInput()
 
         -- start new line
-        if not processing_input then io.write("> ") end
+        if not processingInput then io.write("> ") end
     end
 
     -- establish connection with client
@@ -140,14 +140,14 @@ while true do
     -- receive message from client
     if client then
         client:settimeout(1)
-        client_msg, socket_err = client:receive()
+        clientMsg, socketErr = client:receive()
 
-        if socket_err == "timeout" then
+        if socketErr == "timeout" then
             print("No message from client after 3 seconds")
-            socket_err = nil
+            socketErr = nil
 
         else
-            print("HOOK: "..client_msg)
+            print("HOOK: "..clientMsg)
         end
     end
 end
