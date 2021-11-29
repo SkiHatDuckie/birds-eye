@@ -1,21 +1,14 @@
 local socket = require("socket")
 local lanes = require("lanes")
 
--- create a TCP socket and bind it to the local host
-local server = assert(socket.bind("*", 8080))
-local host, port = "localhost", 8080
-
--- hook object and socket status
-local client = nil
-local socketErr = nil
-local clientMsg = ""
-local status = "not connected"
-
--- emulator status
-local emulatorLaunched = false
-
--- cui status
-local processingInput = false
+local server = assert(socket.bind("*", 8080))  -- socket server object
+local host, port = "localhost", 8080           -- host and port of socket
+local client = nil                             -- socket client object
+local socketErr = nil                          -- any errors with socket communication are stored here
+local clientMsg = ""                           -- message from client
+local status = "not connected"                 -- current status of socket connection
+local emulatorLaunched = false                 -- if emulator is launched or not
+local processingInput = false                  -- if still processing user input
 
 
 -- accept connection from client (if any)
@@ -112,46 +105,51 @@ quit:     disconnect socket and terminate process
 end
 
 
--- cui startup text
-print("=== Birds-Eye ===")
-io.write("> ")
+local function main()
+    -- cui startup text
+    print("=== Birds-Eye ===")
+    io.write("> ")
 
---  main loop
-while true do
-    -- check for user input is ready to be processed
-    if inputThread.status == "done" and not processingInput then
-        -- get input from thread
-        local output = processInput(inputThread[1])
+    --  main loop
+    while true do
+        -- check for user input is ready to be processed
+        if inputThread.status == "done" and not processingInput then
+            -- get input from thread
+            local output = processInput(inputThread[1])
 
-        if output == "break" then break end
+            if output == "break" then break end
 
-        -- regenerate thread to check for input again
-        inputThread = checkInput()
+            -- regenerate thread to check for input again
+            inputThread = checkInput()
 
-        -- start new line
-        if not processingInput then io.write("> ") end
-    end
+            -- start new line
+            if not processingInput then io.write("> ") end
+        end
 
-    -- establish connection with client
-    if status == "connecting" then
-        findConnections()
-    end
+        -- establish connection with client
+        if status == "connecting" then
+            findConnections()
+        end
 
-    -- receive message from client
-    if client then
-        client:settimeout(1)
-        clientMsg, socketErr = client:receive()
+        -- receive message from client
+        if client then
+            client:settimeout(1)
+            clientMsg, socketErr = client:receive()
 
-        if socketErr == "timeout" then
-            print("No message from client after 3 seconds")
-            socketErr = nil
+            if socketErr == "timeout" then
+                print("No message from client after 3 seconds")
+                socketErr = nil
 
-        else
-            print("HOOK: "..clientMsg)
+            else
+                print("HOOK: "..clientMsg)
+            end
         end
     end
+
+    -- close server and client object when finished
+    if client then client:close() end
+    server:close()
 end
 
--- close server and client object when finished
-if client then client:close() end
-server:close()
+
+main()
