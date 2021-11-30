@@ -9,6 +9,15 @@ local clientMsg = ""                           -- message from client
 local status = "not connected"                 -- current status of socket connection
 local emulatorLaunched = false                 -- if emulator is launched or not
 local processingInput = false                  -- if still processing user input
+local hookPath = ""
+
+
+-- reads and stores the contents of the config.txt file
+local function readConfig()
+    local handle = io.open("config.txt")
+    hookPath = handle:read("*l")
+    handle:close()
+end
 
 
 -- accept connection from client (if any)
@@ -30,7 +39,6 @@ end
 local launchEmuhawk = lanes.gen(
     "os",
     function()
-        local hookPath = "C:/Users/Conno/VSCodeProjects/birds-eye/src/hook.lua"
         local socketIp = " --socket_ip=127.0.0.1"
         local socketPort = " --socket_port="..port
         os.execute("cd C:/BizHawk-2.6.2 && EmuHawk.exe"..socketIp..socketPort.." --Lua="..hookPath)
@@ -106,9 +114,10 @@ end
 
 
 local function main()
-    -- cui startup text
+    -- startup
     print("=== Birds-Eye ===")
     io.write("> ")
+    readConfig()
 
     --  main loop
     while true do
