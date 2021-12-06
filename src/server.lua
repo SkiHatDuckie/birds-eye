@@ -6,7 +6,6 @@ local host, port = "localhost", 8080           -- host and port of socket
 local client = nil                             -- socket client object
 local socketErr = nil                          -- any errors with socket communication are stored here
 local clientMsg = ""                           -- message from client
-local status = "not connected"                 -- current status of socket connection
 local emulatorLaunched = false                 -- if emulator is launched or not
 local processingInput = false                  -- if still processing user input
 local hookPath = ""
@@ -22,14 +21,13 @@ end
 
 -- accept connection from client (if any)
 local function findConnections()
-    server:settimeout(3)
+    server:settimeout(10)
     client, socketErr = server:accept()
 
     if socketErr == "timeout" then
-        print("Could not find hook after 3 seconds")
+        print("Could not find hook after 10 seconds")
         socketErr = nil
     else
-        status = "connected"
         processingInput = false
     end
 end
@@ -60,53 +58,38 @@ local inputThread = checkInput()
 -- process user input
 -----------------------------------------------------
 -- === Commands List ===
--- connect:  connect to hook
 -- get ip:   get socket ip
 -- get port: get socket port
 -- help:     display commands list
--- launch:   launch Bizhawk emulator
+-- launch:   launch Bizhawk emulator and connect hook
 -- quit:     disconnect socket and terminate process
 -----------------------------------------------------
 local function processInput(input)
-    if input == "connect" then
-        if status ~= "connected" then
-            status = "connecting"
-            processingInput = true
-
-        else
-            print("Already connected to hook")
-        end
-
-    elseif input == "get ip" then
+    if input == "get ip" then
         print(host)
-
     elseif input == "get port" then
         print(port)
-
     elseif input == "help" then
         io.write(
 [[
 === Commands List ===
-connect:  connect to hook
 get ip:   get socket ip
 get port: get socket port
 help:     display commands list
-launch:   launch Bizhawk emulator
+launch:   launch Bizhawk emulator and connect hook
 quit:     disconnect socket and terminate process
 ]]
         )
-
     elseif input == "launch" then
         if not emulatorLaunched then
+            processingInput = true
             launchEmuhawk()
-
+            findConnections()
         else
             print("Emulator already launched")
         end
-
     elseif input == "quit" then
         return "break"
-
     else
         print("Unknown command \""..input.."\": type \"help\" for a list of commands")
     end
@@ -126,18 +109,17 @@ local function main()
             -- get input from thread
             local output = processInput(inputThread[1])
 
-            if output == "break" then break end
+            if output == "break" then
+                break
+            end
 
             -- regenerate thread to check for input again
             inputThread = checkInput()
 
             -- start new line
-            if not processingInput then io.write("> ") end
-        end
-
-        -- establish connection with client
-        if status == "connecting" then
-            findConnections()
+            if not processingInput then
+                io.write("> ")
+            end
         end
 
         -- receive message from client
@@ -148,7 +130,6 @@ local function main()
             if socketErr == "timeout" then
                 print("No message from client after 3 seconds")
                 socketErr = nil
-
             else
                 print("HOOK: "..clientMsg)
             end
@@ -156,7 +137,9 @@ local function main()
     end
 
     -- close server and client object when finished
-    if client then client:close() end
+    if client then
+        client:close()
+    end
     server:close()
 end
 

@@ -1,6 +1,3 @@
-local send = false  -- if hook should send data to server
-
-
 -- check if key in table
 local function tableContains(table, key)
     return table[key] ~= nil
@@ -8,6 +5,13 @@ end
 
 
 local function main()
+    local send = false                                 -- if hook should send data to server
+
+    -- startup
+    comm.socketServerSend("Hook has been connected!")
+    -- local serverMsg = comm.socketServerResponse()      -- msg from server (TODO)
+
+
     -- main loop
     while true do
         local userInput = input.get()
