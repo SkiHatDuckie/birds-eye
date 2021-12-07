@@ -7,7 +7,7 @@ local host, port = "localhost", 8080 -- host and port of socket
 -- Get the path of hook.lua from config.txt
 -- RETURN: Hook path
 local function getHookPath()
-    local handle = io.open("devconfig.txt")
+    local handle = io.open("config.txt")
     local path = handle:read("*l")
     handle:close()
 
