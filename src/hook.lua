@@ -8,7 +8,7 @@ local function main()
     local send = false                                 -- if hook should send data to server
 
     -- startup
-    comm.socketServerSend("Hook has been connected!")
+    comm.socketServerSend("Hook has been connected!\n")
     -- local serverMsg = comm.socketServerResponse()      -- msg from server (TODO)
 
 
@@ -26,7 +26,7 @@ local function main()
         end
 
         if send then
-            -- returns the framerate
+            -- returns the framerate (TEMPORARY)
             comm.socketServerSend(emu.framecount().."\n")
         end
 
