@@ -1,17 +1,19 @@
 local socket = require("socket")
 local lanes = require("lanes")
 
-local host, port = "localhost", 8080 -- host and port of socket
+local host, port = "localhost", 8080 -- Host and port of socket
 
 
--- Get the path of hook.lua from config.txt
--- RETURN: Hook path
-local function getHookPath()
+-- Get data from config.txt, including hook path and memory
+-- addresses that hook needs to read
+-- RETURN: Hook path, String of memory addresses
+local function getConfigData()
     local handle = io.open("config.txt")
     local path = handle:read("*l")
+    local mem = handle:read("*l")
     handle:close()
 
-    return path
+    return path, mem
 end
 
 
@@ -40,6 +42,14 @@ local function getResponse(client)
 end
 
 
+-- Send a message to hook
+-- client: Socket client object
+-- msg: Message to send
+local function sendMessage(client, msg)
+    client:send(msg.."\n")
+end
+
+
 -- Launch the BizHawk emulator in seperate thread
 -- path: Path to find hook.lua
 local launchEmuhawk = lanes.gen(
@@ -47,7 +57,7 @@ local launchEmuhawk = lanes.gen(
     function(path)
         local socketIp = " --socket_ip=127.0.0.1"
         local socketPort = " --socket_port="..port
-        os.execute("cd C:/BizHawk-2.6.2 && EmuHawk.exe"..socketIp..socketPort.." --Lua="..path)
+        os.execute("cd C:/BizHawk-2.4.2 && EmuHawk.exe"..socketIp..socketPort.." --Lua="..path)
     end
 )
 
@@ -69,12 +79,14 @@ local function main()
     local client = nil
     local emulatorLaunched = false
     local inputThread = checkInput()
+    local hookPath, memoryAddresses = getConfigData()
+    local setup = false
 
-    -- startup
+    -- Startup
     print("=== Birds-Eye ===")
     io.write("> ")
 
-    --  main loop
+    --  Main loop
     while true do
         -- Check if user input is ready to be processed
         if inputThread.status == "done" then
@@ -94,7 +106,7 @@ local function main()
                 print("quit:     disconnect socket and terminate process")
             elseif input == "launch" then
                 if not emulatorLaunched then
-                    launchEmuhawk(getHookPath())
+                    launchEmuhawk(hookPath)
                     emulatorLaunched = true
                 end
                 if not client then
@@ -106,10 +118,10 @@ local function main()
                 print("Unknown command \""..input.."\": type \"help\" for a list of commands")
             end
 
-            -- regenerate thread to check for input again
+            -- Regenerate thread to check for input again
             inputThread = checkInput()
 
-            -- start new line
+            -- Start new line
             io.write("> ")
         end
 
@@ -124,11 +136,19 @@ local function main()
                 emulatorLaunched = false
             elseif msg then
                 print("HOOK: "..msg)
+                if msg == "Hook has been connected!" then
+                    setup = true
+                end
+            end
+
+            if setup then
+                sendMessage(client, memoryAddresses)
+                setup = false
             end
         end
     end
 
-    -- close server and client object when finished
+    -- Close server and client object when finished
     if client then
         client:close()
     end

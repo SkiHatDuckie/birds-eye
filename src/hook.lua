@@ -1,23 +1,57 @@
--- check if key in table
+-- Check if key in table
+-- table: Table to check
+-- key: Key to look for
+-- RETURN: True if key in table, false otherwise
 local function tableContains(table, key)
     return table[key] ~= nil
 end
 
 
+-- Split a received message into a table strings
+-- msg: msg to split apart
+-- RETURN: Iterable of strings
+local function splitMessage(msg)
+    local strTable = {}
+    local k = 1
+    for v in string.gmatch(msg, "[^;]+") do
+        strTable[k] = v
+        k = k + 1
+    end
+    return strTable
+end
+
+
+-- Read the specified memory addresses and return all values as a string
+-- addresses: Memory addresses to read
+-- RETURN: Concatenated string of values at each address in order of
+-- index in addresses
+local function readMemory(addresses)
+    local memory = ""
+    for k, v in pairs(addresses) do
+        v = tonumber(v, 16)
+        memory = memory..mainmemory.readbyte(v)..";"
+    end
+
+    return memory
+end
+
+
+-- Main
 local function main()
-    local send = false                                 -- if hook should send data to server
+    local send = false
 
-    -- startup
+    -- Startup
     comm.socketServerSend("Hook has been connected!\n")
-    -- local serverMsg = comm.socketServerResponse()      -- msg from server (TODO)
+    local msg = comm.socketServerResponse()
+    local memoryAddresses = splitMessage(msg)
+    print("setup completed")
 
-
-    -- main loop
+    -- Main loop
     while true do
         local userInput = input.get()
 
-        -- check user input
-        if tableContains(userInput, "Number0") then
+        -- Check user input
+        if tableContains(userInput, "L") then
             if send then
                 send = false
             else
@@ -26,11 +60,11 @@ local function main()
         end
 
         if send then
-            -- returns the framerate (TEMPORARY)
-            comm.socketServerSend(emu.framecount().."\n")
+            -- Returns the values stored in each memeory address
+            comm.socketServerSend(readMemory(memoryAddresses).."\n")
         end
 
-        -- next frame!
+        -- Next frame!
         emu.frameadvance()
     end
 end

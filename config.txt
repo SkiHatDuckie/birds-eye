@@ -1,2 +1,2 @@
 [hook.lua path goes here]
-[memory registries to read (seperated by a semicolon) go here] (TODO)
+[memory addresses to read (seperated by a semicolon) go here]
