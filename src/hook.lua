@@ -41,8 +41,9 @@ local function main()
     local send = false
 
     -- Startup
-    comm.socketServerSend("Hook has been connected!\n")
+    comm.socketServerSend("SETUP:\n")
     local msg = comm.socketServerResponse()
+    print(msg)
     local memoryAddresses = splitMessage(msg)
     print("setup completed")
 
@@ -61,7 +62,7 @@ local function main()
 
         if send then
             -- Returns the values stored in each memeory address
-            comm.socketServerSend(readMemory(memoryAddresses).."\n")
+            comm.socketServerSend("MEMORY:"..readMemory(memoryAddresses).."\n")
         end
 
         -- Next frame!
