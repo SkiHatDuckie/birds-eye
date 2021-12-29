@@ -1,2 +1,0 @@
-[hook.lua path goes here]
-[memory addresses to read (seperated by a semicolon) go here]

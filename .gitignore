@@ -1,2 +1,4 @@
 /.vscode
-/devconfig.txt
+/src/bin
+/src/obj
+/BizHawk
