@@ -14,3 +14,5 @@ BizHawk
 +--EmuHawk.exe
 +--...
 ```
+
+From the command-line, in the directory of your BizHawk folder, run .\EmuHawk.exe --open-ext-tool-dll=BirdsEye
