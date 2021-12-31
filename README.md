@@ -1,6 +1,7 @@
 # birds-eye
-Requires BizHawk v2.6.2
 WORK IN PROGRESS
+
+Requires BizHawk v2.6.2
 
 ## Setup
 Move BirdsEye.dll to the ExternalTools directory in your BizHawk folder.
@@ -15,4 +16,4 @@ BizHawk
 +--...
 ```
 
-From the command-line, in the directory of your BizHawk folder, run .\EmuHawk.exe --open-ext-tool-dll=BirdsEye
+From the command-line, in the directory of your BizHawk folder, run `.\EmuHawk.exe --open-ext-tool-dll=BirdsEye`
