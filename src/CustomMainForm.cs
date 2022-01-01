@@ -76,10 +76,9 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Executed once after the constructor, and again every time a rom is
-        /// loaded or reloaded.
+        /// Change the text of `_lblRomName` to display the current rom.
         ///</summary>
-        public override void Restart() {
+        private void DisplayLoadedRom() {
             if (APIs.GameInfo.GetRomName() != "Null") {
                 _lblRomName.Text = $"Currently loaded: {APIs.GameInfo.GetRomName()}";
             } else {
@@ -100,6 +99,18 @@ namespace BirdsEye {
         }
 
         ///<summary>
+        /// Update every item in `_lstMemory` with the new values in memory
+        ///</summary>
+        private void UpdateMemoryListBox() {
+            if (APIs.GameInfo.GetRomName() != "Null") {
+                uint[] memoryData = ReadMemory(_memoryAddresses.ToArray());
+                for (int i = 0; i < _lstMemory.Items.Count; i++) {
+                    _lstMemory.Items[i] = memoryData[i].ToString();
+                }
+            }
+        }
+
+        ///<summary>
         /// Determine if all characters in s are valid hexadecimal digits.
         /// Returns false if an invalid digit is found, otherwise this returns true.
         ///</summary>
@@ -114,15 +125,18 @@ namespace BirdsEye {
         }
 
         ///<summary>
+        /// Executed once after the constructor, and again every time a rom is
+        /// loaded or reloaded.
+        ///</summary>
+        public override void Restart() {
+            DisplayLoadedRom();
+        }
+
+        ///<summary>
         /// Executed after every frame.
         ///</summary>
         protected override void UpdateAfter() {
-            if (APIs.GameInfo.GetRomName() != "Null") {
-                uint[] memoryData = ReadMemory(_memoryAddresses.ToArray());
-                for (int i = 0; i < _lstMemory.Items.Count; i++) {
-                    _lstMemory.Items[i] = memoryData[i].ToString();
-                }
-            }
+            UpdateMemoryListBox();
         }
 
         ///<summary>
