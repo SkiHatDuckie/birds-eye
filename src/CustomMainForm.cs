@@ -19,13 +19,15 @@ namespace BirdsEye {
 		private ApiContainer APIs => _apiContainer ?? throw new NullReferenceException();
 
         private Label _lblRomName;
+
         private Label _lblMemory;
         private ListBox _lstAddress;
         private ListBox _lstMemory;
         private Button _btnNewAddress;
         private TextBox _txtAddress;
-
         private List<long> _memoryAddresses = new List<long>();
+
+        private Label _lblCommMode;
 
         protected override string WindowTitleStatic => "BirdsEye";
 
@@ -34,34 +36,59 @@ namespace BirdsEye {
         /// Code is executed only once (when EmuHawk.exe is launched).
         ///</summary>
         public CustomMainForm() {
-            ClientSize = new Size(320, 320);
+            ClientSize = new Size(480, 320);
             SuspendLayout();
-
+            //
+            // Rom Label
+            //
             _lblRomName = new Label {
                 AutoSize = true,
                 Location = new Point(0, 0),
             };
+            //
+            // Memory Label
+            //
             _lblMemory = new Label {
                 AutoSize = true,
                 Location = new Point(0, 25),
                 Text = "Memory"
             };
+            //
+            // New Address button
+            //
             _btnNewAddress = new Button {
                 Location = new Point(0, 45),
                 Size = new Size(100, 25),
                 Text = "Add Address:"
             };
+            //
+            // New Address TextBox
+            //
             _txtAddress = new TextBox {
                 Location = new Point(100, 45),
 			    Size = new Size(70, 20)
             };
+            //
+            // Memory Address ListBox
+            //
             _lstAddress = new ListBox {
                 Location = new Point(100, 70),
                 Size = new Size(70, 150)
             };
+            //
+            // Memory Data ListBox
+            //
             _lstMemory = new ListBox {
                 Location = new Point(0, 70),
                 Size = new Size(100, 150)
+            };
+            //
+            // Communication Mode Label
+            //
+            _lblCommMode = new Label {
+                AutoSize = true,
+                Location = new Point(240, 0),
+                Text = "Communication Mode: Manual"
             };
 
             Controls.Add(_lblRomName);
@@ -70,6 +97,8 @@ namespace BirdsEye {
             Controls.Add(_txtAddress);
             Controls.Add(_lstAddress);
             Controls.Add(_lstMemory);
+            Controls.Add(_lblCommMode);
+
             ResumeLayout();
 
             _btnNewAddress.Click += btnNewAddress_Click;
