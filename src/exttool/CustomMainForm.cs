@@ -23,6 +23,8 @@ namespace BirdsEye {
 
         private Memory _memory = new Memory();
 
+        private ControllerInput _input = new ControllerInput();
+
         private Label _lblRomName;
 
         private Label _lblMemory;
@@ -135,18 +137,33 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Executed after every frame.
+        /// Executed before every frame.
         /// If in commandeer mode, this function will enter into a while loop,
         /// halting the emulator until input is received from the connected
         /// python script, or until connection is switched to manual mode.
         ///</summary>
-        protected override void UpdateAfter() {
+        protected override void UpdateBefore() {
             UpdateMemoryListBox();
             CheckConnectionStatus();
             if (_server.IsConnected()) {
-                string msg = _server.GetResponse();
+                ProcessResponses();
+            }
+            if (_commandeer) {
+                _input.ExecuteInput(APIs);
+            }
+        }
+
+        ///<summary>
+        /// Process responses received by `_server`.
+        ///</summary>
+        public void ProcessResponses() {
+            string[] msgs = _server.GetResponses();
+            foreach (string msg in msgs) {
                 if (msg.Equals("MEMORY")) {
                     _server.SendMessage(_memory.FormatMemory());
+                } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("INPUT")) {
+                    _input.SetInputFromString(msg);
+                    _server.SendMessage("Received");
                 }
             }
         }

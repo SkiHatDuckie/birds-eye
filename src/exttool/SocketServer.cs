@@ -38,18 +38,19 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Decode and return a message from the client object.
+        /// Decode and return messages from the client object.
+        /// Multiple messages are seperated by an '\n'.
         /// Precondition: socket client is connected to the server.
         ///</summary>
-        public string GetResponse() {
+        public string[] GetResponses() {
             if (_clientStream == null) {
-                return "";
+                return new string[0];
             }
 
             Byte[] bytes = new Byte[256];
             int i = _clientStream.Read(bytes, 0, bytes.Length);
 
-            return Encoding.ASCII.GetString(bytes, 0, i);
+            return Encoding.ASCII.GetString(bytes, 0, i).Split('\n');
         }
 
         ///<summary>

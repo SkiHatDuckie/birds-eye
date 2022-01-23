@@ -1,18 +1,9 @@
-using System;
 using System.Collections.Generic;
 
 using BizHawk.Client.Common;
 
 namespace BirdsEye {
     public class Memory {
-        /// <remarks>
-		/// <see cref="ApiContainer"/> can be used as a shorthand for accessing 
-        /// the various APIs, more like the Lua syntax.
-		/// </remarks>
-		public ApiContainer? _apiContainer { get; set; }
-
-		private ApiContainer APIs => _apiContainer ?? throw new NullReferenceException();
-
         private List<long> _addressList = new List<long>();
         private List<int> _memoryList = new List<int>();
 

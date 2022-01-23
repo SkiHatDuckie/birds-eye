@@ -59,8 +59,9 @@ class SocketClient:
         Get the latest memory data from the server. This will return the 
         latest value received. Returns '-' if there has been no data 
         received yet from an address, and a bytes object representing the received data otherwise.
+        Precondition: client is connected to a socket.
         """
-        self.client.sendall(b"MEMORY")
+        self.client.sendall("MEMORY\n".encode())
         return self.client.recv(1024)
 
     def setControllerInput(self, a=False, b=False, up=False, down=False, right=False, left=False):
@@ -68,6 +69,7 @@ class SocketClient:
         Set and controller inputs to be executed in the emulator.
         All inputs are set to False be default.
         The inputs are executed until a new controller input is sent.
+        Precondition: client is connected to a socket.
 
         :param a: State of the A button
         :type a: bool
@@ -87,7 +89,12 @@ class SocketClient:
         :param left: State of the Left button on the control pad
         :type left: bool
         """
-        pass
+        boolToString = {False : "false", True : "true"}
+        controllerInput = boolToString[a] + ";" + boolToString[b] + ";" + \
+                          boolToString[up] + ";" + boolToString[down] + ";" + \
+                          boolToString[right] + ";" + boolToString[left] + ";"
+        self.client.sendall(("INPUT;" + controllerInput + "\n").encode())
+        self.client.recv(1024)
 
 
 # Use for debugging and testing purposes only
@@ -100,4 +107,4 @@ if __name__ == "__main__":
             if commThread.is_alive():
                 commThread.join()
 
-            print(client.getMemory())
+            client.setControllerInput(right=True)
