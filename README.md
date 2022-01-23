@@ -19,13 +19,13 @@ BizHawk
 From the command-line, in the directory of your BizHawk folder, run 
 `.\EmuHawk.exe --open-ext-tool-dll=BirdsEye`
 
-## Connection Modes
+## Communication Modes
+Determines how the external tool communicates with the emulator and a connected python script.
 
 ### Manual
-The external tool will not send or receive messages to and from any connected scripts. User will still have
+The external tool will not send or receive messages to and from a connected python script. User will still have
 full control over the emulator using the external tool or the emulator itself.
 
 ### Commandeer
-This mode will allow any connected scripts to begin interacting with the emulator by sending and receiving
-messages to and from the external tool. Frame advancement is determined by time it takes for the external tool
-to send a message to any connected scripts and receive a message back.
+This mode will allow a connected python script to begin interacting with the emulator by sending and receiving
+messages to and from the external tool.

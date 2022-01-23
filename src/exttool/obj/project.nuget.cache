@@ -1,0 +1,11 @@
+{
+  "version": 2,
+  "dgSpecHash": "sCOPfEKJWxBjNAHvyFjITdZa5mhO+LWUpH0kOVr37zcJtGyh6l6LoK4cECubOVlGJKrD4PYY2VhJwqSZQ1e4eg==",
+  "success": true,
+  "projectFilePath": "C:\\Users\\Conno\\VSCodeProjects\\birds-eye\\src\\exttool\\BirdsEye.csproj",
+  "expectedPackageFiles": [
+    "C:\\Users\\Conno\\.nuget\\packages\\microsoft.netframework.referenceassemblies\\1.0.0\\microsoft.netframework.referenceassemblies.1.0.0.nupkg.sha512",
+    "C:\\Users\\Conno\\.nuget\\packages\\microsoft.netframework.referenceassemblies.net48\\1.0.0\\microsoft.netframework.referenceassemblies.net48.1.0.0.nupkg.sha512"
+  ],
+  "logs": []
+}
