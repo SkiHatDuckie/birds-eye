@@ -1,4 +1,4 @@
 /.vscode
-/src/exttool/bin
-/src/exttool/obj
+/exttool/bin
+/exttool/obj
 /BizHawk
