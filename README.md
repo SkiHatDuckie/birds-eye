@@ -1,10 +1,24 @@
 # birds-eye
-WORK IN PROGRESS
+A BizHawk external tool + python library giving a (hopefully) convenient interface for python scripts to communicate with the BizHawk emulator. <br/>
 
-Requires BizHawk v2.6.2
+This is the first project I've made with the intent of others using it, so any kind of suggestion would be incredibly helpful. <br/>
+Thank you :]
+
+This library is VERY bares bones at the moment, with only the current features available: <br/>
+- Connecting to the external tool <br/>
+- Retrieving memory data from the external tool (addresses are set in the ext. tool) <br/>
+- Sending inputs to be executed in the emulator <br/>
+
+I plan on adding a lot more as I continue to use this library myself. (see TODO section below) <br/>
+
+Tested using BizHawk version 2.6.2, however other versions *might* work.
 
 ## Setup
-Move BirdsEye.dll to the ExternalTools directory in your BizHawk folder.
+
+### External Tool
+The external tool can be found and downloaded in the [birds-eye github repository](https://github.com/SkiHatDuckie/birds-eye). (check releases)
+
+Move BirdsEye.dll to the ExternalTools directory in your BizHawk folder. <br/>
 It should look like this afterwords:
 
 ```
@@ -16,8 +30,11 @@ BizHawk
 +--...
 ```
 
-From the command-line, in the directory of your BizHawk folder, run 
-`.\EmuHawk.exe --open-ext-tool-dll=BirdsEye`
+If everything is correct, then you should be able to open up the external tool by running the emulator, then going to <br/>
+Tools -> External Tools -> BirdsEye
+
+### Installing the library
+`pip install birds-eye-lib`
 
 ## Communication Modes
 Determines how the external tool communicates with the emulator and a connected python script.
@@ -29,3 +46,13 @@ full control over the emulator using the external tool or the emulator itself.
 ### Commandeer
 This mode will allow a connected python script to begin interacting with the emulator by sending and receiving
 messages to and from the external tool.
+
+## TODO
+This is a list of the current improvements that are currently being worked on, or plan to be. <br/>
+
+### Library
+- Check if socket disconnects <br/>
+- Method for reconnecting to the ext. tool after prematurely disconnecting <br/>
+
+### External Tool
+- Save selected memory addresses to be read from for later sessions. <br/>
