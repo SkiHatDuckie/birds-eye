@@ -30,17 +30,21 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Converts all memory data stored into a concatenated string seperated by a ';'.
+        /// Converts all addresses and the memory data stored into a 
+        /// concatenated string, formatted as such:
+        /// "ADDR:DATA;ADDR:DATA;..." where both ADDR and DATA are in
+        /// decimal notation.
         /// '-' is is added if data has been collected from an address 
         /// (i.e. the value is still -1).
         ///</summary>
         public string FormatMemory() {
             string result = "";
-            foreach (int i in _memoryList) {
+            for (int i = 0; i < _memoryList.Count; i++) {
+                result += _addressList[i] + ":";
                 if (i == -1) {
                     result += "-;";
                 } else {
-                    result += i + ";";
+                    result += _memoryList[i] + ";";
                 }
             }
             return (result != "") ? result : ";";
