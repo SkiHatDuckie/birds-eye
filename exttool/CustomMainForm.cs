@@ -2,6 +2,7 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
+using System.Timers;
 using System.Windows.Forms;
 
 using BizHawk.Client.Common;
@@ -20,24 +21,21 @@ namespace BirdsEye {
 
         private SocketServer _server = new SocketServer("127.0.0.1", 8080);
         private Thread _commThread;
+        private System.Timers.Timer _timeoutTimer = new System.Timers.Timer(10000);
 
         private Memory _memory = new Memory();
 
         private ControllerInput _input = new ControllerInput();
 
-        private Label _lblRomName;
+        private bool _commandeer = false;
 
+        private Label _lblRomName;
         private Label _lblMemory;
         private ListBox _lstAddress;
         private ListBox _lstMemory;
-        private Button _btnNewAddress;
-        private TextBox _txtAddress;
-
         private Label _lblCommMode;
         private Button _btnChangeCommMode;
         private Label _lblConnectionStatus;
-        private bool _commandeer = false;
-
         private Label _lblError;
 
         protected override string WindowTitleStatic => "BirdsEye";
@@ -50,6 +48,8 @@ namespace BirdsEye {
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
             _commThread.Start();
 
+            _timeoutTimer.Elapsed += OnTimeout;
+            
             ClientSize = new Size(480, 320);
             SuspendLayout();
 
@@ -64,25 +64,14 @@ namespace BirdsEye {
                 Location = new Point(0, 25),
                 Text = "Memory"
             };
-            // New Address button
-            _btnNewAddress = new Button {
-                Location = new Point(0, 45),
-                Size = new Size(100, 25),
-                Text = "Add Address:"
-            };
-            // New Address TextBox
-            _txtAddress = new TextBox {
-                Location = new Point(100, 45),
-			    Size = new Size(70, 20)
-            };
             // Memory Address ListBox
             _lstAddress = new ListBox {
-                Location = new Point(100, 70),
+                Location = new Point(100, 50),
                 Size = new Size(70, 150)
             };
             // Memory Data ListBox
             _lstMemory = new ListBox {
-                Location = new Point(0, 70),
+                Location = new Point(0, 50),
                 Size = new Size(100, 150)
             };
             // Communication Mode Label
@@ -113,18 +102,15 @@ namespace BirdsEye {
 
             Controls.Add(_lblRomName);
             Controls.Add(_lblMemory);
-            Controls.Add(_btnNewAddress);
-            Controls.Add(_txtAddress);
             Controls.Add(_lstAddress);
             Controls.Add(_lstMemory);
             Controls.Add(_lblCommMode);
             Controls.Add(_btnChangeCommMode);
             Controls.Add(_lblConnectionStatus);
             Controls.Add(_lblError);
-
             ResumeLayout();
 
-            _btnNewAddress.Click += btnNewAddressOnClick;
+            // _btnNewAddress.Click += btnNewAddressOnClick;
             _btnChangeCommMode.Click += btnChangeCommModeOnClick;
         }
 
@@ -144,7 +130,7 @@ namespace BirdsEye {
         ///</summary>
         protected override void UpdateBefore() {
             UpdateMemoryListBox();
-            CheckConnectionStatus();
+            UpdateConnectionStatus();
             if (_server.IsConnected()) {
                 ProcessResponses();
             }
@@ -156,10 +142,23 @@ namespace BirdsEye {
         ///<summary>
         /// Process responses received by `_server`.
         ///</summary>
-        public void ProcessResponses() {
+        private void ProcessResponses() {
             string[] msgs = _server.GetResponses();
+            if (msgs.Length == 0) {
+                if (!_timeoutTimer.Enabled) {
+                    _timeoutTimer.Start();
+                }
+            } else {
+                if (_timeoutTimer.Enabled) {
+                    _timeoutTimer.Stop();
+                }
+            }
+
             foreach (string msg in msgs) {
-                if (msg.Equals("MEMORY")) {
+                if (msg.Length > 6 && msg.Substring(0, 6).Equals("MEMORY")) {
+                    if (msg != "MEMORY;") {
+                        _memory.AddAddressesFromString(msg);
+                    }
                     _server.SendMessage(_memory.FormatMemory());
                 } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("INPUT")) {
                     _input.SetInputFromString(msg);
@@ -206,37 +205,19 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Check on the current stutus of the socket connection and update
-        /// `_lblConnectionStatus` accordingly. Returns true if connected.
+        /// Update the current stutus of the socket connection and update
+        /// `_lblConnectionStatus` accordingly.
         ///</summary>
-        public bool CheckConnectionStatus() {
+        private void UpdateConnectionStatus() {
             if (_server.IsConnected()) {
                 _lblConnectionStatus.Text = "Script found";
                 _lblConnectionStatus.ForeColor = Color.Blue;
-                if (!_commThread.IsAlive) { _commThread.Join(); }
-                return true;
+                if (!_commThread.IsAlive) {
+                    _commThread.Join();
+                }
             } else {
                 _lblConnectionStatus.Text = "No script found";
                 _lblConnectionStatus.ForeColor = Color.Red;
-                return false;
-            }
-        }
-
-        ///<summary>
-        /// Update the `_lstAddress`, `_lstMemory`, and `_memory` with the entered 
-        /// address in `_txtAddress`. Displays an error if the input could not be
-        /// converted to hexadecimal.
-        ///</summary>
-        private void btnNewAddressOnClick(object sender, EventArgs e) {
-            if (!string.IsNullOrWhiteSpace(_txtAddress.Text) && !_lstAddress.Items.Contains(_txtAddress.Text)) {
-                if (IsHexadecimal(_txtAddress.Text)) {
-                    _memory.AddAddress(Convert.ToInt64(_txtAddress.Text, 16));
-                    _lstAddress.Items.Add(_txtAddress.Text);
-                    _lstMemory.Items.Add("-");
-                    _lblError.Text = "";
-                } else {
-                    _lblError.Text = "ERROR: Invalid hexidecimal number";
-                }
             }
         }
 
@@ -257,6 +238,23 @@ namespace BirdsEye {
                 _lblCommMode.Text = "Communication Mode: Manual";
             }
             _lblError.Text = "";
+        }
+
+        ///<summary>
+        /// Executed every time `_timeoutTimer` interval has elapsed.
+        /// Displays an error message in the external tool.
+        ///</summary>
+        private void OnTimeout(Object source, ElapsedEventArgs e) {
+            _timeoutTimer.Stop();
+
+            _server.CloseConnection();
+            UpdateConnectionStatus();
+            _lblError.Text = "ERROR: No response from script after 10 seconds, connection closed";
+            _commandeer = false;
+            _lblCommMode.Text = "Communication Mode: Manual";
+
+            _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
+            _commThread.Start();
         }
     }
 }

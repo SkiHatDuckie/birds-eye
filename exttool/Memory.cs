@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 
 using BizHawk.Client.Common;
@@ -15,6 +16,16 @@ namespace BirdsEye {
         public void AddAddress(long address) {
             _addressList.Add(address);
             _memoryList.Add(-1);
+        }
+
+        ///<summary>
+        /// Add memory addresses from a string.
+        ///</summary>
+        public void AddAddressesFromString(string str) {
+            string[] addressList = str.Substring(7).Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+            foreach (string addr in addressList) {
+                AddAddress(Convert.ToInt64(addr, 10));
+            }
         }
 
         ///<summary>

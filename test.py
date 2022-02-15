@@ -1,18 +1,32 @@
-from birdseye import SocketClient;
+import birdseye as bird
 
+# External tool connects to this address and port 
+# TODO: Add way in external tool to set port and address
 HOST = "127.0.0.1"
 PORT = 8080
 
-# This script is used for testing the features of Birds Eye python library
-if __name__ == "__main__":
-    client = SocketClient(HOST, PORT)
-    client.connect()
 
-    while True:
-        if client.isConnected():
-            print(client.getMemory())
-            client.setControllerInput(right=True)
-        else:
-            break
+def main():
+    quit_attempt = False
+
+    if not client.is_connected():
+        print("Could not connect to external tool :[")
+        quit_attempt = True
+
+    while not quit_attempt:
+        print(client.get_memory())
+
+
+if __name__ == "__main__":
+    client = bird.Client(HOST, PORT)
+
+    # Add some arbitrary addresses to read from.
+    # All addresses must be added before calling bird.comm.start().
+    client.add_address(0x000E)
+    client.add_address(0x001D)
+    client.add_address_range(0x0100, 0x010A)
     
-    print("No server at {} on port {}.".format(HOST, PORT))
+    client.connect()
+    print("Conencting to server at {} on port {}.".format(HOST, PORT))
+
+    main()

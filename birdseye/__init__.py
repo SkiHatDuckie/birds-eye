@@ -1,1 +1,1 @@
-from birdseye.socketClient import SocketClient
+from birdseye.socketClient import Client

@@ -1,98 +1,94 @@
 import socket;
-from threading import Thread;
 
 
-class ThreadWithReturnValue(Thread):
-    """
-    A Thread object that collects a return value when the thread is joined.
-    Do not use this directly.
-    """
-    def __init__(self, group=None, target=None, name=None, args=(), kwargs={}):
-        Thread.__init__(self, group, target, name, args, kwargs)
-        self._return = None
-    
-    def run(self):
-        if self._target is not None:
-            self._return = self._target(*self._args, **self._kwargs)
-    
-    def join(self, *args):
-        Thread.join(self, *args)
-        return self._return
-
-
-class SocketClient:
-    """
-    Instantiate a socket client object that will be used to
+class Client:
+    """Instantiate a socket client object that will be used to
     communicate with the BirdsEye server located at a set
     port and address.
+
     Use the BirdsEye external tool to get and set the port and
     address the server should listen in to.
 
-    :param ip: Socket address
-    :type ip: str
+    `ip` is the socket address
 
-    :param port: Socket port
-    :type port: int
-    """
+    `port` is the socket port number"""
+
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-        self.connectionStatus = -1
+        self.connection_status = -1
+
+        self.address_list = []
 
     def connect(self):
-        """
-        Attempts to send a connection request to the BirdsEye socket server.
-        """
-        self.connectionStatus = self.client.connect_ex((self.ip, self.port))
-    
-    def isConnected(self):
-        """
-        Returns true if client is connected to a socket server object.
-        """
-        if self.connectionStatus == 0:
+        """Attempts to send a connection request to the BirdsEye socket server."""
+
+        self.connection_status = self.client.connect_ex((self.ip, self.port))
+
+    def is_connected(self):
+        """Returns true if client is connected to a socket server object."""
+
+        if self.connection_status == 0:
             return True
         else:
             return False
+    
+    def add_address(self, addr):
+        """Adds an address for the external tool to return.
+        
+        `addr` is a hexidecimal value representing the address to read from 
+        in the BizHawk emulator's memory."""
 
-    def getMemory(self):
-        """
-        Get the latest memory data from the server. This will return the 
-        latest value received. Returns '-' if there has been no data 
-        received yet from an address, and a bytes object representing the received data otherwise.
-        Precondition: client is connected to a socket.
-        """
-        self.client.sendall("MEMORY\n".encode())
-        return self.client.recv(1024)
+        if not addr in self.address_list:
+            self.address_list.append(str(addr))
 
-    def setControllerInput(self, a=False, b=False, up=False, down=False, right=False, left=False):
-        """
-        Set and controller inputs to be executed in the emulator.
+    def add_address_range(self, start, end):
+        """Precondition: `start` >= `end`.
+
+        Adds a range or addresses from `start` to `end`, inclusive.
+
+        `start` is a hexidecimal value representing the first address in the range.
+
+        `end` is a hexidecimal value representing the last address in the range."""
+
+        for addr in range(int(start), int(end) + 1):
+            self.add_address(addr)
+
+    def get_memory(self) -> str:
+        """Gets the latest memory data from the emulator. This will return
+        latest value received for each address paired with the address it was read from. 
+        Returns 'int(addr):-' if there has been no data received yet from an address, 
+        and 'int(addr):int(data)' representing the received data otherwise.
+
+        Precondition: client is connected to a socket."""
+
+        self.client.sendall(("MEMORY;" + ";".join(self.address_list) + "\n").encode())
+        self.address_list = []
+
+        return self.client.recv(1024).decode()
+
+    def set_controller_input(self, a=False, b=False, up=False, down=False, right=False, left=False):
+        """Sets the controller inputs to be executed in the emulator.
         All inputs are set to False be default.
         The inputs are executed until a new controller input is sent.
         Precondition: client is connected to a socket.
 
-        :param a: State of the A button
-        :type a: bool
+        `a` is the state of the A button
 
-        :param b: State of the B button
-        :type b: bool
+        `b` is the state of the B button
 
-        :param up: State of the Up button on the control pad
-        :type up: bool
+        `up` is the state of the Up button on the control pad
 
-        :param down: State of the Down button on the control pad
-        :type down: bool
+        `down` is the state of the Down button on the control pad
 
-        :param right: State of the Right button on the control pad
-        :type right: bool
+        `right` is the state of the Right button on the control pad
 
-        :param left: State of the Left button on the control pad
-        :type left: bool
-        """
-        boolToString = {False : "false", True : "true"}
-        controllerInput = boolToString[a] + ";" + boolToString[b] + ";" + \
-                          boolToString[up] + ";" + boolToString[down] + ";" + \
-                          boolToString[right] + ";" + boolToString[left] + ";"
-        self.client.sendall(("INPUT;" + controllerInput + "\n").encode())
+        `left` is the state of the Left button on the control pad"""
+
+        bool_to_string = {False : "false", True : "true"}
+        controller_input = bool_to_string[a] + ";" + bool_to_string[b] + ";" + \
+                           bool_to_string[up] + ";" + bool_to_string[down] + ";" + \
+                           bool_to_string[right] + ";" + bool_to_string[left]
+        self.client.sendall(("INPUT;" + controller_input + "\n").encode())
         self.client.recv(1024)
