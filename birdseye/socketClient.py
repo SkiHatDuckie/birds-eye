@@ -66,7 +66,11 @@ class Client:
         self.client.sendall(("MEMORY;" + ";".join(self.address_list) + "\n").encode())
         self.address_list = []
 
-        return self.client.recv(1024).decode()
+        try:
+            return self.client.recv(1024).decode()
+        except:
+            raise ConnectionError("Connection with external tool was lost.")
+
 
     def set_controller_input(self, a=False, b=False, up=False, down=False, right=False, left=False):
         """Sets the controller inputs to be executed in the emulator.
@@ -91,4 +95,8 @@ class Client:
                            bool_to_string[up] + ";" + bool_to_string[down] + ";" + \
                            bool_to_string[right] + ";" + bool_to_string[left]
         self.client.sendall(("INPUT;" + controller_input + "\n").encode())
-        self.client.recv(1024)
+
+        try:
+            self.client.recv(1024)
+        except:
+            raise ConnectionError("Connection with external tool was lost.")
