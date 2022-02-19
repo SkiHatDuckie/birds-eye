@@ -28,9 +28,6 @@ namespace BirdsEye {
         private bool _commandeer = false;
 
         private Label _lblRomName;
-        private Label _lblMemory;
-        private ListBox _lstAddress;
-        private ListBox _lstMemory;
         private Label _lblCommMode;
         private Button _btnChangeCommMode;
         private Label _lblConnectionStatus;
@@ -53,22 +50,6 @@ namespace BirdsEye {
             _lblRomName = new Label {
                 AutoSize = true,
                 Location = new Point(0, 0),
-            };
-            // Memory Label
-            _lblMemory = new Label {
-                AutoSize = true,
-                Location = new Point(0, 25),
-                Text = "Memory"
-            };
-            // Memory Address ListBox
-            _lstAddress = new ListBox {
-                Location = new Point(100, 50),
-                Size = new Size(70, 150)
-            };
-            // Memory Data ListBox
-            _lstMemory = new ListBox {
-                Location = new Point(0, 50),
-                Size = new Size(100, 150)
             };
             // Communication Mode Label
             _lblCommMode = new Label {
@@ -97,9 +78,6 @@ namespace BirdsEye {
             };
 
             Controls.Add(_lblRomName);
-            Controls.Add(_lblMemory);
-            Controls.Add(_lstAddress);
-            Controls.Add(_lstMemory);
             Controls.Add(_lblCommMode);
             Controls.Add(_btnChangeCommMode);
             Controls.Add(_lblConnectionStatus);
@@ -125,7 +103,6 @@ namespace BirdsEye {
         /// python script, or until connection is switched to manual mode.
         ///</summary>
         protected override void UpdateBefore() {
-            UpdateMemoryListBox();
             UpdateConnectionStatus();
             if (_server.IsConnected()) {
                 ProcessResponses();
@@ -165,18 +142,6 @@ namespace BirdsEye {
                 _lblRomName.Text = $"Currently loaded: {APIs.GameInfo.GetRomName()}";
             } else {
                 _lblRomName.Text = "Currently loaded: Nothing";
-            }
-        }
-
-        ///<summary>
-        /// Update every item in `_lstMemory` with the new values in memory
-        ///</summary>
-        private void UpdateMemoryListBox() {
-            if (APIs.GameInfo.GetRomName() != "Null") {
-                int[] memoryData = _memory.ReadMemory(APIs);
-                for (int i = 0; i < _lstMemory.Items.Count; i++) {
-                    _lstMemory.Items[i] = memoryData[i].ToString();
-                }
             }
         }
 
