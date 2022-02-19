@@ -9,8 +9,8 @@ namespace BirdsEye {
         private List<int> _memoryList = new List<int>();
 
         ///<summary>
-        /// Adds a memory address to `_addressList`.
-        /// A corresponding value (-1) is added to `_memoryList`.
+        /// Adds a memory address to `_addressList`.<br/>
+        /// A corresponding value (-1) is added to `_memoryList`.<br/>
         /// Precondition: `address` represents a valid hexadecimal value.
         ///</summary>
         public void AddAddress(long address) {
@@ -29,8 +29,8 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Reads each address in `_addressList` in main memory.
-        /// Stores the gathered values in `_memoryList`.
+        /// Reads each address in `_addressList` in main memory.<br/>
+        /// Stores the gathered values in `_memoryList`.<br/>
         /// Needs the API interface in order to read memory from the emulator.
         ///</summary>
         public int[] ReadMemory(ApiContainer APIs) {
@@ -42,9 +42,9 @@ namespace BirdsEye {
 
         ///<summary>
         /// Converts all addresses and the memory data stored into a 
-        /// concatenated string, formatted as such:
+        /// concatenated string, formatted as such:<br/>
         /// "ADDR:DATA;ADDR:DATA;..." where both ADDR and DATA are in
-        /// decimal notation.
+        /// decimal notation.<br/>
         /// '-' is is added if data has been collected from an address 
         /// (i.e. the value is still -1).
         ///</summary>
@@ -59,6 +59,15 @@ namespace BirdsEye {
                 }
             }
             return (result != "") ? result : ";";
+        }
+
+        ///<summary>
+        /// Removes any addresses that have been set and empties both
+        /// `_addressList` and `_memoryList`.
+        ///</summary>
+        public void ClearAddresses() {
+            _addressList.Clear();
+            _memoryList.Clear();
         }
     }
 }

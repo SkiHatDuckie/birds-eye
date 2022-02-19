@@ -38,22 +38,28 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Decode and return messages from the client object.
-        /// Multiple messages are seperated by an '\n'.
+        /// Decode and return messages from the client object.<br/>
+        /// Multiple messages are seperated by an '\n'.<br/>
+        /// Returns an array with "ERR" if an exception while reading from
+        /// the socket stream occurred.
         ///</summary>
         public string[] GetResponses() {
             if (_clientStream == null) {
-                return new string[0];
+                return new string[] {"ERR"};
             }
 
             Byte[] bytes = new Byte[1024];
-            int i = _clientStream.Read(bytes, 0, bytes.Length);
+            try {
+                int i = _clientStream.Read(bytes, 0, bytes.Length);
 
-            return Encoding.ASCII.GetString(bytes, 0, i).Split('\n');
+                return Encoding.ASCII.GetString(bytes, 0, i).Split('\n');
+            } catch {
+                return new string[] {"ERR"};
+            }
         }
 
         ///<summary>
-        /// Converts a string message into bytes and sends it to the client object.
+        /// Converts a string message into bytes and sends it to the client object.<br/>
         /// Precondition: socket client is connected to the server.
         ///</summary>
         public void SendMessage(string msg) {
@@ -72,8 +78,6 @@ namespace BirdsEye {
             if (_client != null) {
                 _client.Close();
                 _client = null;
-            } if (_clientStream != null) {
-                _clientStream.Close(0);
                 _clientStream = null;
             }
         }

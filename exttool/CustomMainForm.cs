@@ -2,7 +2,6 @@ using System;
 using System.Drawing;
 using System.Linq;
 using System.Threading;
-using System.Timers;
 using System.Windows.Forms;
 
 using BizHawk.Client.Common;
@@ -21,7 +20,6 @@ namespace BirdsEye {
 
         private SocketServer _server = new SocketServer("127.0.0.1", 8080);
         private Thread _commThread;
-        private System.Timers.Timer _timeoutTimer = new System.Timers.Timer(10000);
 
         private Memory _memory = new Memory();
 
@@ -41,14 +39,12 @@ namespace BirdsEye {
         protected override string WindowTitleStatic => "BirdsEye";
 
         ///<summary>
-        /// Main form constructor.
+        /// Main form constructor.<br/>
         /// Code is executed only once (when EmuHawk.exe is launched).
         ///</summary>
         public CustomMainForm() {
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
             _commThread.Start();
-
-            _timeoutTimer.Elapsed += OnTimeout;
             
             ClientSize = new Size(480, 320);
             SuspendLayout();
@@ -123,7 +119,7 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Executed before every frame.
+        /// Executed before every frame.<br/>
         /// If in commandeer mode, this function will enter into a while loop,
         /// halting the emulator until input is received from the connected
         /// python script, or until connection is switched to manual mode.
@@ -144,14 +140,8 @@ namespace BirdsEye {
         ///</summary>
         private void ProcessResponses() {
             string[] msgs = _server.GetResponses();
-            if (msgs.Length == 0) {
-                if (!_timeoutTimer.Enabled) {
-                    _timeoutTimer.Start();
-                }
-            } else {
-                if (_timeoutTimer.Enabled) {
-                    _timeoutTimer.Stop();
-                }
+            if (msgs[0] == "ERR") {
+                HandleDisconnect();
             }
 
             foreach (string msg in msgs) {
@@ -191,7 +181,7 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Determine if all characters in `str` are valid hexadecimal digits.
+        /// Determine if all characters in `str` are valid hexadecimal digits.<br/>
         /// Returns false if an invalid digit is found, otherwise this returns true.
         ///</summary>
         private bool IsHexadecimal(string str) {
@@ -222,7 +212,22 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Change the communication mode from manual -> commandeer or commandeer -> manual.
+        /// Executed when the socket client connection abrupty ends.<br/>
+        /// Displays an error message in the external tool and cleans up socket resources.
+        ///</summary>
+        private void HandleDisconnect() {
+            _server.CloseConnection();
+            UpdateConnectionStatus();
+            _lblError.Text = "ERROR: Connection with script has been abruptly stopped.";
+            _commandeer = false;
+            _lblCommMode.Text = "Communication Mode: Manual";
+
+            _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
+            _commThread.Start();
+        }
+
+        ///<summary>
+        /// Change the communication mode from manual -> commandeer or commandeer -> manual.<br/>
         /// Displays an error if the user attempts to switch to commandeer mode before a
         /// script is connected.
         ///</summary>
@@ -238,23 +243,6 @@ namespace BirdsEye {
                 _lblCommMode.Text = "Communication Mode: Manual";
             }
             _lblError.Text = "";
-        }
-
-        ///<summary>
-        /// Executed every time `_timeoutTimer` interval has elapsed.
-        /// Displays an error message in the external tool.
-        ///</summary>
-        private void OnTimeout(Object source, ElapsedEventArgs e) {
-            _timeoutTimer.Stop();
-
-            _server.CloseConnection();
-            UpdateConnectionStatus();
-            _lblError.Text = "ERROR: No response from script after 10 seconds, connection closed";
-            _commandeer = false;
-            _lblCommMode.Text = "Communication Mode: Manual";
-
-            _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
-            _commThread.Start();
         }
     }
 }
