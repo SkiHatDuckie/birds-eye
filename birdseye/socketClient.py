@@ -20,6 +20,10 @@ class Client:
         self.connection_status = -1
 
         self.address_list = []
+        self.memory_request = ""
+        self.input_request = ""
+
+        self.received_memory = None
 
     def connect(self):
         """Attempts to send a connection request to the BirdsEye socket server."""
@@ -33,6 +37,19 @@ class Client:
             return True
         else:
             return False
+    
+    def send_requests(self):
+        """Send requests to the external tool and receive data collected by
+        the external tool."""
+        self.client.sendall((self.memory_request + self.input_request).encode())
+
+        try:
+            responses = self.client.recv(2048).decode()
+            for response in responses.split("\n"):
+                if len(response) > 6 and response[0:6] == "MEMORY":
+                    self.received_memory = response[7:]
+        except:
+            ConnectionError("Connection with external tool was lost.")
     
     def add_address(self, addr):
         """Adds an address for the external tool to return.
@@ -63,14 +80,10 @@ class Client:
 
         Precondition: client is connected to a socket."""
 
-        self.client.sendall(("MEMORY;" + ";".join(self.address_list) + "\n").encode())
+        self.memory_request = "MEMORY;" + ";".join(self.address_list) + "\n"
         self.address_list = []
 
-        try:
-            return self.client.recv(1024).decode()
-        except:
-            raise ConnectionError("Connection with external tool was lost.")
-
+        return self.received_memory
 
     def set_controller_input(self, a=False, b=False, up=False, down=False, right=False, left=False):
         """Sets the controller inputs to be executed in the emulator.
@@ -94,9 +107,4 @@ class Client:
         controller_input = bool_to_string[a] + ";" + bool_to_string[b] + ";" + \
                            bool_to_string[up] + ";" + bool_to_string[down] + ";" + \
                            bool_to_string[right] + ";" + bool_to_string[left]
-        self.client.sendall(("INPUT;" + controller_input + "\n").encode())
-
-        try:
-            self.client.recv(1024)
-        except:
-            raise ConnectionError("Connection with external tool was lost.")
+        self.input_request = "INPUT;" + controller_input + "\n"

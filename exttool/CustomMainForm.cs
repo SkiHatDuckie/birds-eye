@@ -105,7 +105,7 @@ namespace BirdsEye {
         protected override void UpdateBefore() {
             UpdateConnectionStatus();
             if (_server.IsConnected()) {
-                ProcessResponses();
+                ProcessRequests();
             }
             if (_commandeer) {
                 _input.ExecuteInput(APIs);
@@ -113,25 +113,28 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Process responses received by `_server`.
+        /// Process requests received by `_server`.
         ///</summary>
-        private void ProcessResponses() {
-            string[] msgs = _server.GetResponses();
+        private void ProcessRequests() {
+            string[] msgs = _server.GetRequests();
             if (msgs[0] == "ERR") {
                 HandleDisconnect();
             }
+            string response = "";
 
             foreach (string msg in msgs) {
                 if (msg.Length > 6 && msg.Substring(0, 6).Equals("MEMORY")) {
                     if (msg != "MEMORY;") {
                         _memory.AddAddressesFromString(msg);
                     }
-                    _server.SendMessage(_memory.FormatMemory());
+                    response += "MEMORY;" + _memory.FormatMemory() + "\n";
                 } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("INPUT")) {
                     _input.SetInputFromString(msg);
-                    _server.SendMessage("Received");
+                    response += "INPUT;\n";
                 }
             }
+
+            _server.SendMessage(response);
         }
 
         ///<summary>
@@ -167,6 +170,7 @@ namespace BirdsEye {
             if (_server.IsConnected()) {
                 _lblConnectionStatus.Text = "Script found";
                 _lblConnectionStatus.ForeColor = Color.Blue;
+                _lblError.Text = "";
                 if (!_commThread.IsAlive) {
                     _commThread.Join();
                 }
@@ -186,6 +190,8 @@ namespace BirdsEye {
             _lblError.Text = "ERROR: Connection with script has been abruptly stopped.";
             _commandeer = false;
             _lblCommMode.Text = "Communication Mode: Manual";
+
+            _memory.ClearAddresses();
 
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
             _commThread.Start();

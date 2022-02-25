@@ -16,6 +16,12 @@ def main():
     while not quit_attempt:
         print(client.get_memory())
 
+        client.set_controller_input(right=True)
+        
+        # Must be called in order to send requests to the external tool 
+        # and receive data collected by the external tool
+        client.send_requests()
+
 
 if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
@@ -25,7 +31,7 @@ if __name__ == "__main__":
     client.add_address(0x000E)
     client.add_address(0x001D)
     client.add_address_range(0x0100, 0x010A)
-    
+
     client.connect()
     print("Conencting to server at {} on port {}.".format(HOST, PORT))
 

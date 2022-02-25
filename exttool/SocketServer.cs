@@ -43,7 +43,7 @@ namespace BirdsEye {
         /// Returns an array with "ERR" if an exception while reading from
         /// the socket stream occurred.
         ///</summary>
-        public string[] GetResponses() {
+        public string[] GetRequests() {
             if (_clientStream == null) {
                 return new string[] {"ERR"};
             }
