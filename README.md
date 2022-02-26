@@ -51,8 +51,8 @@ messages to and from the external tool.
 This is a list of the current improvements that are currently being worked on, or plan to be. <br/>
 
 ### Library
-- Check if socket disconnects <br/>
-- Method for reconnecting to the ext. tool after prematurely disconnecting <br/>
+- Functions to get the frame data was received on. <br/>
 
 ### External Tool
-- Save selected memory addresses to be read from for later sessions. <br/>
+- Send the current frame with every sent message to the library <br/>
+- Decorate the tool GUI if I'm bored <br/>

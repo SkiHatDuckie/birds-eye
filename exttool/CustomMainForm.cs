@@ -25,31 +25,24 @@ namespace BirdsEye {
 
         private ControllerInput _input = new ControllerInput();
 
+        private bool _commandeer = false;
+
         private Label _lblRomName;
-
-        private Label _lblMemory;
-        private ListBox _lstAddress;
-        private ListBox _lstMemory;
-        private Button _btnNewAddress;
-        private TextBox _txtAddress;
-
         private Label _lblCommMode;
         private Button _btnChangeCommMode;
         private Label _lblConnectionStatus;
-        private bool _commandeer = false;
-
         private Label _lblError;
 
         protected override string WindowTitleStatic => "BirdsEye";
 
         ///<summary>
-        /// Main form constructor.
+        /// Main form constructor.<br/>
         /// Code is executed only once (when EmuHawk.exe is launched).
         ///</summary>
         public CustomMainForm() {
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
             _commThread.Start();
-
+            
             ClientSize = new Size(480, 320);
             SuspendLayout();
 
@@ -57,33 +50,6 @@ namespace BirdsEye {
             _lblRomName = new Label {
                 AutoSize = true,
                 Location = new Point(0, 0),
-            };
-            // Memory Label
-            _lblMemory = new Label {
-                AutoSize = true,
-                Location = new Point(0, 25),
-                Text = "Memory"
-            };
-            // New Address button
-            _btnNewAddress = new Button {
-                Location = new Point(0, 45),
-                Size = new Size(100, 25),
-                Text = "Add Address:"
-            };
-            // New Address TextBox
-            _txtAddress = new TextBox {
-                Location = new Point(100, 45),
-			    Size = new Size(70, 20)
-            };
-            // Memory Address ListBox
-            _lstAddress = new ListBox {
-                Location = new Point(100, 70),
-                Size = new Size(70, 150)
-            };
-            // Memory Data ListBox
-            _lstMemory = new ListBox {
-                Location = new Point(0, 70),
-                Size = new Size(100, 150)
             };
             // Communication Mode Label
             _lblCommMode = new Label {
@@ -112,19 +78,13 @@ namespace BirdsEye {
             };
 
             Controls.Add(_lblRomName);
-            Controls.Add(_lblMemory);
-            Controls.Add(_btnNewAddress);
-            Controls.Add(_txtAddress);
-            Controls.Add(_lstAddress);
-            Controls.Add(_lstMemory);
             Controls.Add(_lblCommMode);
             Controls.Add(_btnChangeCommMode);
             Controls.Add(_lblConnectionStatus);
             Controls.Add(_lblError);
-
             ResumeLayout();
 
-            _btnNewAddress.Click += btnNewAddressOnClick;
+            // _btnNewAddress.Click += btnNewAddressOnClick;
             _btnChangeCommMode.Click += btnChangeCommModeOnClick;
         }
 
@@ -137,16 +97,15 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Executed before every frame.
+        /// Executed before every frame.<br/>
         /// If in commandeer mode, this function will enter into a while loop,
         /// halting the emulator until input is received from the connected
         /// python script, or until connection is switched to manual mode.
         ///</summary>
         protected override void UpdateBefore() {
-            UpdateMemoryListBox();
-            CheckConnectionStatus();
+            UpdateConnectionStatus();
             if (_server.IsConnected()) {
-                ProcessResponses();
+                ProcessRequests();
             }
             if (_commandeer) {
                 _input.ExecuteInput(APIs);
@@ -154,18 +113,28 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Process responses received by `_server`.
+        /// Process requests received by `_server`.
         ///</summary>
-        public void ProcessResponses() {
-            string[] msgs = _server.GetResponses();
+        private void ProcessRequests() {
+            string[] msgs = _server.GetRequests();
+            if (msgs[0] == "ERR") {
+                HandleDisconnect();
+            }
+            string response = "";
+
             foreach (string msg in msgs) {
-                if (msg.Equals("MEMORY")) {
-                    _server.SendMessage(_memory.FormatMemory());
+                if (msg.Length > 6 && msg.Substring(0, 6).Equals("MEMORY")) {
+                    if (msg != "MEMORY;") {
+                        _memory.AddAddressesFromString(msg);
+                    }
+                    response += "MEMORY;" + _memory.FormatMemory() + "\n";
                 } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("INPUT")) {
                     _input.SetInputFromString(msg);
-                    _server.SendMessage("Received");
+                    response += "INPUT;\n";
                 }
             }
+
+            _server.SendMessage(response);
         }
 
         ///<summary>
@@ -180,19 +149,7 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Update every item in `_lstMemory` with the new values in memory
-        ///</summary>
-        private void UpdateMemoryListBox() {
-            if (APIs.GameInfo.GetRomName() != "Null") {
-                int[] memoryData = _memory.ReadMemory(APIs);
-                for (int i = 0; i < _lstMemory.Items.Count; i++) {
-                    _lstMemory.Items[i] = memoryData[i].ToString();
-                }
-            }
-        }
-
-        ///<summary>
-        /// Determine if all characters in `str` are valid hexadecimal digits.
+        /// Determine if all characters in `str` are valid hexadecimal digits.<br/>
         /// Returns false if an invalid digit is found, otherwise this returns true.
         ///</summary>
         private bool IsHexadecimal(string str) {
@@ -206,42 +163,42 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Check on the current stutus of the socket connection and update
-        /// `_lblConnectionStatus` accordingly. Returns true if connected.
+        /// Update the current stutus of the socket connection and update
+        /// `_lblConnectionStatus` accordingly.
         ///</summary>
-        public bool CheckConnectionStatus() {
+        private void UpdateConnectionStatus() {
             if (_server.IsConnected()) {
                 _lblConnectionStatus.Text = "Script found";
                 _lblConnectionStatus.ForeColor = Color.Blue;
-                if (!_commThread.IsAlive) { _commThread.Join(); }
-                return true;
+                _lblError.Text = "";
+                if (!_commThread.IsAlive) {
+                    _commThread.Join();
+                }
             } else {
                 _lblConnectionStatus.Text = "No script found";
                 _lblConnectionStatus.ForeColor = Color.Red;
-                return false;
             }
         }
 
         ///<summary>
-        /// Update the `_lstAddress`, `_lstMemory`, and `_memory` with the entered 
-        /// address in `_txtAddress`. Displays an error if the input could not be
-        /// converted to hexadecimal.
+        /// Executed when the socket client connection abrupty ends.<br/>
+        /// Displays an error message in the external tool and cleans up socket resources.
         ///</summary>
-        private void btnNewAddressOnClick(object sender, EventArgs e) {
-            if (!string.IsNullOrWhiteSpace(_txtAddress.Text) && !_lstAddress.Items.Contains(_txtAddress.Text)) {
-                if (IsHexadecimal(_txtAddress.Text)) {
-                    _memory.AddAddress(Convert.ToInt64(_txtAddress.Text, 16));
-                    _lstAddress.Items.Add(_txtAddress.Text);
-                    _lstMemory.Items.Add("-");
-                    _lblError.Text = "";
-                } else {
-                    _lblError.Text = "ERROR: Invalid hexidecimal number";
-                }
-            }
+        private void HandleDisconnect() {
+            _server.CloseConnection();
+            UpdateConnectionStatus();
+            _lblError.Text = "ERROR: Connection with script has been abruptly stopped.";
+            _commandeer = false;
+            _lblCommMode.Text = "Communication Mode: Manual";
+
+            _memory.ClearAddresses();
+
+            _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
+            _commThread.Start();
         }
 
         ///<summary>
-        /// Change the communication mode from manual -> commandeer or commandeer -> manual.
+        /// Change the communication mode from manual -> commandeer or commandeer -> manual.<br/>
         /// Displays an error if the user attempts to switch to commandeer mode before a
         /// script is connected.
         ///</summary>
