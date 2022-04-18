@@ -47,12 +47,6 @@ full control over the emulator using the external tool or the emulator itself.
 This mode will allow a connected python script to begin interacting with the emulator by sending and receiving
 messages to and from the external tool.
 
-## TODO
-This is a list of the current improvements that are currently being worked on, or plan to be. <br/>
-
-### Library
-- Functions to get the frame data was received on. <br/>
-
-### External Tool
-- Send the current frame with every sent message to the library <br/>
-- Decorate the tool GUI if I'm bored <br/>
+## Updates
+I will now be creating a list of features that I plan on adding or deleting or fixing as an issue ticket to make 
+it easier for both myself and others to see what needs to be done for the next update.
