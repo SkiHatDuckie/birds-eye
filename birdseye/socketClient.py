@@ -61,9 +61,9 @@ class Client:
             self.address_list.append(str(addr))
 
     def add_address_range(self, start, end):
-        """Precondition: `start` >= `end`.
+        """Precondition: `start` <= `end`.
 
-        Adds a range or addresses from `start` to `end`, inclusive.
+        Adds a range of addresses from `start` to `end`, both inclusive.
 
         `start` is a hexidecimal value representing the first address in the range.
 
