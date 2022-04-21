@@ -23,7 +23,7 @@ class Client:
         self.memory_request = ""
         self.input_request = ""
 
-        self.received_memory = None
+        self.received_memory = ""
 
     def connect(self):
         """Attempts to send a connection request to the BirdsEye socket server."""
