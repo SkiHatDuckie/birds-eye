@@ -72,7 +72,7 @@ class Client:
         for addr in range(int(start), int(end) + 1):
             self.add_address(addr)
 
-    def get_memory(self) -> str:
+    def get_memory(self) -> list:
         """Gets the latest memory data from the emulator. This will return
         latest value received for each address paired with the address it was read from. 
         Returns 'int(addr):-' if there has been no data received yet from an address, 
@@ -83,7 +83,7 @@ class Client:
         self.memory_request = "MEMORY;" + ";".join(self.address_list) + "\n"
         self.address_list = []
 
-        return self.received_memory
+        return self.received_memory.split(";")
 
     def set_controller_input(self, a=False, b=False, up=False, down=False, right=False, left=False):
         """Sets the controller inputs to be executed in the emulator.

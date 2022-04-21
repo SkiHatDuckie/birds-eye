@@ -14,7 +14,8 @@ def main():
         quit_attempt = True
 
     while not quit_attempt:
-        print(client.get_memory())
+        memory = client.get_memory()
+        print([data for data in memory])
 
         client.set_controller_input(right=True)
         
@@ -27,7 +28,7 @@ if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
 
     # Add some arbitrary addresses to read from.
-    # All addresses must be added before calling bird.comm.start().
+    # All addresses must be added before calling bird.client.connect().
     client.add_address(0x000E)
     client.add_address(0x001D)
     client.add_address_range(0x0100, 0x010A)
