@@ -29,6 +29,12 @@ class Client:
         """Attempts to send a connection request to the BirdsEye socket server."""
 
         self.connection_status = self.client.connect_ex((self.ip, self.port))
+    
+    def disconnect(self):
+        """Close connection with socket server."""
+
+        self.client.close()
+        self.connection_status = -1
 
     def is_connected(self):
         """Returns true if client is connected to a socket server object."""
@@ -49,7 +55,7 @@ class Client:
                 if len(response) > 6 and response[0:6] == "MEMORY":
                     self.received_memory = response[7:]
         except:
-            ConnectionError("Connection with external tool was lost.")
+            self.disconnect()
     
     def add_address(self, addr):
         """Adds an address for the external tool to return.
