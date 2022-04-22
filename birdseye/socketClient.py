@@ -59,6 +59,7 @@ class Client:
 
         if not addr in self.address_list:
             self.address_list.append(str(addr))
+            self.received_memory += str(addr) + ":-;"
 
     def add_address_range(self, start, end):
         """Precondition: `start` <= `end`.
