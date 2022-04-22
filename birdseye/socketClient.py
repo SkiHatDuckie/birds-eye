@@ -31,8 +31,10 @@ class Client:
         self.connection_status = self.client.connect_ex((self.ip, self.port))
     
     def disconnect(self):
-        """Close connection with socket server."""
+        """Close connection with socket server. Sends a final message notifying the
+        external tool."""
 
+        self.client.sendall("CLOSE;\n".encode())
         self.client.close()
         self.connection_status = -1
 

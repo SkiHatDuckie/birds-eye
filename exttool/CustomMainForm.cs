@@ -131,6 +131,8 @@ namespace BirdsEye {
                 } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("INPUT")) {
                     _input.SetInputFromString(msg);
                     response += "INPUT;\n";
+                } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("CLOSE")) {
+                    HandleDisconnect();
                 }
             }
 
