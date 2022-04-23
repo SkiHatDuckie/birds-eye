@@ -1,4 +1,5 @@
 import birdseye as bird
+import time
 
 # External tool connects to this address and port 
 # TODO: Add way in external tool to set port and address
@@ -28,7 +29,8 @@ if __name__ == "__main__":
         cnt = 0
 
         while not client.is_connected():
-            print("Connection lost! Attempting to reconnect...")
+            print("Connection lost! Attempting to reconnect in 10 seconds...")
+            time.sleep(10)
             client.connect()
 
         # Will attempt to get and print the memory it receives 200 times
@@ -41,10 +43,13 @@ if __name__ == "__main__":
             
             # Must be called in order to send requests to the external tool 
             # and receive data collected by the external tool
-            client.send_requests()
+            res = client.send_requests()
+
+            if res == -1:
+                break
 
             cnt += 1
 
             if cnt >= 200:
-                client.disconnect()
+                client.send_close_request()
                 close_attempt = True

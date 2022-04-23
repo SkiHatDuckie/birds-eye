@@ -30,11 +30,16 @@ class Client:
 
         self.connection_status = self.client.connect_ex((self.ip, self.port))
     
-    def disconnect(self):
-        """Close connection with socket server. Sends a final message notifying the
+    def send_close_request(self):
+        """Close connection with socket server and send a final message notifying the
         external tool."""
 
         self.client.sendall("CLOSE;\n".encode())
+        self.close_connection()
+
+    def close_connection(self):
+        """Close connection with socket server. Set `client.connection_status` to -1"""
+
         self.client.close()
         self.connection_status = -1
 
@@ -46,18 +51,25 @@ class Client:
         else:
             return False
     
-    def send_requests(self):
+    def send_requests(self) -> int:
         """Send requests to the external tool and receive data collected by
-        the external tool."""
-        self.client.sendall((self.memory_request + self.input_request).encode())
-
+        the external tool.
+        
+        Returns an int representing the result. 0 for no issue, and -1 
+        if an exception occured."""
         try:
+            self.client.sendall((self.memory_request + self.input_request).encode())
+
             responses = self.client.recv(2048).decode()
             for response in responses.split("\n"):
                 if len(response) > 6 and response[0:6] == "MEMORY":
                     self.received_memory = response[7:]
+            
+            return 0
         except:
-            self.disconnect()
+            self.close_connection()
+            
+            return -1
     
     def add_address(self, addr):
         """Adds an address for the external tool to return.
