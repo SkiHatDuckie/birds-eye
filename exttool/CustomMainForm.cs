@@ -40,6 +40,8 @@ namespace BirdsEye {
         /// Code is executed only once (when EmuHawk.exe is launched).
         ///</summary>
         public CustomMainForm() {
+            this.FormClosing += OnFormClosing;
+
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
             _commThread.Start();
             
@@ -189,7 +191,7 @@ namespace BirdsEye {
         private void HandleDisconnect() {
             _server.CloseConnection();
             UpdateConnectionStatus();
-            _lblError.Text = "ERROR: Connection with script has been abruptly stopped.";
+            _lblError.Text = "Connection with script has been abruptly stopped.";
             _commandeer = false;
             _lblCommMode.Text = "Communication Mode: Manual";
 
@@ -216,6 +218,19 @@ namespace BirdsEye {
                 _lblCommMode.Text = "Communication Mode: Manual";
             }
             _lblError.Text = "";
+        }
+
+        ///<summary>
+        /// Close any resources and threads before closing the application.
+        /// Attempts to abort out of any thread, regardless of state.
+        ///</summary>
+        private void OnFormClosing(object sender, FormClosingEventArgs e) {
+            // TODO: Is this an ok approach to terminating the thread?
+            try {
+                _commThread.Abort();
+            } catch {}
+
+            _server.CloseAll();
         }
     }
 }

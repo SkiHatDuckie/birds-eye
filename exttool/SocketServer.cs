@@ -19,15 +19,16 @@ namespace BirdsEye {
             _port = port;
             _host = IPAddress.Parse(host);
             _server = new TcpListener(_host, _port);
-            _server.Start();
         }
 
         ///<summary>
         /// Accept a connection request from a client object.
         ///</summary>
         public void AcceptConnections() {
+            _server.Start();
             _client = _server.AcceptTcpClient();
             _clientStream = _client.GetStream();
+            _server.Stop();
         }
 
         ///<summary>
@@ -72,7 +73,7 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// End communication with the connected client object 
+        /// End communication with the connected client object.
         ///</summary>
         public void CloseConnection() {
             if (_client != null) {
@@ -80,6 +81,15 @@ namespace BirdsEye {
                 _client = null;
                 _clientStream = null;
             }
+        }
+
+        ///<summary>
+        /// Stop listening for connections if still doing so,
+        /// and then close all socket objects.
+        ///</summary>
+        public void CloseAll() {
+            _server.Stop();
+            CloseConnection();
         }
     }
 }

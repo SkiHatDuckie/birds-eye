@@ -48,5 +48,3 @@ if __name__ == "__main__":
             if cnt >= 200:
                 client.disconnect()
                 close_attempt = True
-        
-
