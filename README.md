@@ -6,7 +6,7 @@ Thank you :]
 
 This library is VERY bares bones at the moment, with only the current features available: <br/>
 - Connecting to the external tool <br/>
-- Retrieving memory data from the external tool (addresses are set in the ext. tool) <br/>
+- Retrieving memory data from the external tool <br/>
 - Sending inputs to be executed in the emulator <br/>
 
 I plan on adding a lot more as I continue to use this library myself. <br/>
