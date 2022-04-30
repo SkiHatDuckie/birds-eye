@@ -1,4 +1,5 @@
 import birdseye as bird
+import time
 
 # External tool connects to this address and port 
 # TODO: Add way in external tool to set port and address
@@ -6,28 +7,11 @@ HOST = "127.0.0.1"
 PORT = 8080
 
 
-def main():
-    quit_attempt = False
-
-    if not client.is_connected():
-        print("Could not connect to external tool :[")
-        quit_attempt = True
-
-    while not quit_attempt:
-        print(client.get_memory())
-
-        client.set_controller_input(right=True)
-        
-        # Must be called in order to send requests to the external tool 
-        # and receive data collected by the external tool
-        client.send_requests()
-
-
 if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
 
     # Add some arbitrary addresses to read from.
-    # All addresses must be added before calling bird.comm.start().
+    # All addresses must be added before calling bird.client.connect().
     client.add_address(0x000E)
     client.add_address(0x001D)
     client.add_address_range(0x0100, 0x010A)
@@ -35,4 +19,38 @@ if __name__ == "__main__":
     client.connect()
     print("Conencting to server at {} on port {}.".format(HOST, PORT))
 
-    main()
+    close_attempt = False
+
+    if not client.is_connected():
+            print("Could not connect to external tool :[")
+            close_attempt = True
+
+    while not close_attempt:
+        cnt = 0
+
+        # If connection lost, complain roughly every 10 seconds until user
+        # gets the hint that something is wrong with the external tool.
+        while not client.is_connected():
+            print("Connection lost! Attempting to reconnect in 10 seconds...")
+            time.sleep(10)
+            client.connect()
+
+        while client.is_connected():
+            memory = client.get_memory()
+            print([data for data in memory])
+
+            client.set_controller_input(right=True)
+            
+            # Must be called in order to send requests to the external tool 
+            # and process data received from the external tool.
+            res = client.send_requests()
+
+            if res == -1:
+                break
+
+            cnt += 1
+
+            # After 1000 responses are received, break from main loop and end test.
+            if cnt >= 1000:
+                client.send_close_request()
+                close_attempt = True

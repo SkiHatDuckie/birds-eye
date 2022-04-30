@@ -9,11 +9,11 @@ namespace BirdsEye {
         private List<int> _memoryList = new List<int>();
 
         ///<summary>
-        /// Adds a memory address to `_addressList`.<br/>
-        /// A corresponding value (-1) is added to `_memoryList`.<br/>
+        /// Add a memory address to `_addressList`.<br/>
+        /// An integer `-1` is added to `_memoryList`.<br/>
         /// Precondition: `address` represents a valid hexadecimal value.
         ///</summary>
-        public void AddAddress(long address) {
+        private void AddAddress(long address) {
             _addressList.Add(address);
             _memoryList.Add(-1);
         }
@@ -29,8 +29,8 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Reads each address in `_addressList` in main memory.<br/>
-        /// Stores the gathered values in `_memoryList`.<br/>
+        /// Read each address in `_addressList` in main memory.<br/>
+        /// Store the gathered values in `_memoryList`.<br/>
         /// Needs the API interface in order to read memory from the emulator.
         ///</summary>
         public int[] ReadMemory(ApiContainer APIs) {
@@ -41,19 +41,18 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Converts all addresses and the memory data stored into a 
-        /// concatenated string, formatted as such:<br/>
+        /// Concatenate all addresses and memory data into one string,
+        /// formatted as such:<br/>
         /// "ADDR:DATA;ADDR:DATA;..." where both ADDR and DATA are in
-        /// decimal notation.<br/>
-        /// '-' is is added if data has been collected from an address 
-        /// (i.e. the value is still -1).
+        /// decimal form.<br/>
+        /// `-1` is added if data has not been collected from an address.
         ///</summary>
         public string FormatMemory() {
             string result = "";
             for (int i = 0; i < _memoryList.Count; i++) {
                 result += _addressList[i] + ":";
                 if (i == -1) {
-                    result += "-;";
+                    result += "-1;";
                 } else {
                     result += _memoryList[i] + ";";
                 }
@@ -62,7 +61,7 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Removes any addresses that have been set and empties both
+        /// Remove any addresses that have been set and empty both
         /// `_addressList` and `_memoryList`.
         ///</summary>
         public void ClearAddresses() {
