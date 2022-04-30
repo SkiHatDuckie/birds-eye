@@ -28,13 +28,13 @@ if __name__ == "__main__":
     while not close_attempt:
         cnt = 0
 
+        # If connection lost, complain roughly every 10 seconds until user
+        # gets the hint that something is wrong with the external tool.
         while not client.is_connected():
             print("Connection lost! Attempting to reconnect in 10 seconds...")
             time.sleep(10)
             client.connect()
 
-        # Will attempt to get and print the memory it receives 200 times
-        # before disconnecting from the external tool
         while client.is_connected():
             memory = client.get_memory()
             print([data for data in memory])
@@ -42,7 +42,7 @@ if __name__ == "__main__":
             client.set_controller_input(right=True)
             
             # Must be called in order to send requests to the external tool 
-            # and receive data collected by the external tool
+            # and process data received from the external tool.
             res = client.send_requests()
 
             if res == -1:
@@ -50,6 +50,7 @@ if __name__ == "__main__":
 
             cnt += 1
 
-            if cnt >= 200:
+            # After 1000 responses are received, break from main loop and end test.
+            if cnt >= 1000:
                 client.send_close_request()
                 close_attempt = True

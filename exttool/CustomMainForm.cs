@@ -86,7 +86,6 @@ namespace BirdsEye {
             Controls.Add(_lblError);
             ResumeLayout();
 
-            // _btnNewAddress.Click += btnNewAddressOnClick;
             _btnChangeCommMode.Click += btnChangeCommModeOnClick;
         }
 
@@ -99,10 +98,7 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Executed before every frame.<br/>
-        /// If in commandeer mode, this function will enter into a while loop,
-        /// halting the emulator until input is received from the connected
-        /// python script, or until connection is switched to manual mode.
+        /// Executed before every frame.
         ///</summary>
         protected override void UpdateBefore() {
             UpdateConnectionStatus();
@@ -116,6 +112,8 @@ namespace BirdsEye {
 
         ///<summary>
         /// Process requests received by `_server`.
+        /// Disconnects python client if an error occurs when receiving data, or
+        /// if the python client sends a request for the connection to be closed.
         ///</summary>
         private void ProcessRequests() {
             string[] msgs = _server.GetRequests();
@@ -167,7 +165,7 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Update the current stutus of the socket connection and update
+        /// Update the current status of the socket connection and update
         /// `_lblConnectionStatus` accordingly.
         ///</summary>
         private void UpdateConnectionStatus() {
@@ -185,13 +183,14 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Executed when the socket client connection abrupty ends.<br/>
+        /// Executed when the socket connection abrupty ends, or when requested
+        /// by the python client.<br/>
         /// Displays an error message in the external tool and cleans up socket resources.
         ///</summary>
         private void HandleDisconnect() {
             _server.CloseConnection();
             UpdateConnectionStatus();
-            _lblError.Text = "Connection with script has been abruptly stopped.";
+            _lblError.Text = "Connection with script has been stopped.";
             _commandeer = false;
             _lblCommMode.Text = "Communication Mode: Manual";
 
@@ -202,9 +201,9 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Change the communication mode from manual -> commandeer or commandeer -> manual.<br/>
+        /// Change the communication mode from manual -> commandeer, or commandeer -> manual.<br/>
         /// Displays an error if the user attempts to switch to commandeer mode before a
-        /// script is connected.
+        /// python client is connected.
         ///</summary>
         private void btnChangeCommModeOnClick(object sender, EventArgs e) {
             if (!_server.IsConnected() && !_commandeer) {

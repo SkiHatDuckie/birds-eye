@@ -13,7 +13,7 @@ namespace BirdsEye {
 
         ///<summary>
         /// Create a socket server object that listens for 
-        /// connections at the given port and address.
+        /// connections at a given port and address.
         ///</summary>
         public SocketServer(string host, int port) {
             _port = port;
@@ -22,7 +22,7 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Accept a connection request from a client object.
+        /// Accept a connection request from a python client.
         ///</summary>
         public void AcceptConnections() {
             _server.Start();
@@ -32,14 +32,14 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Returns true if a client object is connected to the server.
+        /// Returns true if a python client is connected to the server.
         ///</summary>
         public bool IsConnected() {
             return (_client == null) ? false : true;
         }
 
         ///<summary>
-        /// Decode and return messages from the client object.<br/>
+        /// Decode and return messages from the python client.<br/>
         /// Multiple messages are seperated by an '\n'.<br/>
         /// Returns an array with "ERR" if an exception while reading from
         /// the socket stream occurred.
@@ -60,8 +60,8 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Converts a string message into bytes and sends it to the client object.<br/>
-        /// Precondition: socket client is connected to the server.
+        /// Converts a string message into bytes and sends it to the python client.<br/>
+        /// Precondition: python client is connected to the server.
         ///</summary>
         public void SendMessage(string msg) {
             if (_clientStream == null) {
@@ -73,7 +73,7 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// End communication with the connected client object.
+        /// End communication with the connected python client.
         ///</summary>
         public void CloseConnection() {
             if (_client != null) {

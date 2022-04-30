@@ -2,8 +2,8 @@ import socket;
 
 
 class Client:
-    """Instantiate a socket client object that will be used to
-    communicate with the BirdsEye server located at a set
+    """A socket client object that will be used to
+    communicate with the external tool located at a set
     port and address.
 
     Use the BirdsEye external tool to get and set the port and
@@ -26,25 +26,29 @@ class Client:
         self.received_memory = ""
 
     def connect(self):
-        """Attempts to send a connection request to the BirdsEye socket server."""
+        """Attempt to connect to the external tool.
+        
+        Call `Client.is_connected()` to see if the attempt was successful."""
 
         self.connection_status = self.client.connect_ex((self.ip, self.port))
     
     def send_close_request(self):
-        """Close connection with socket server and send a final message notifying the
-        external tool."""
+        """Close socket connection with external tool and send a final message
+        notifying the external tool before closing."""
 
         self.client.sendall("CLOSE;\n".encode())
         self.close_connection()
 
     def close_connection(self):
-        """Close connection with socket server. Set `client.connection_status` to -1"""
+        """Close connection with external tool. 
+        
+        Set `Client.connection_status` to -1 (no connection)"""
 
         self.client.close()
         self.connection_status = -1
 
     def is_connected(self):
-        """Returns true if client is connected to a socket server object."""
+        """Returns true if client is connected to the external tool."""
 
         if self.connection_status == 0:
             return True
@@ -56,7 +60,9 @@ class Client:
         the external tool.
         
         Returns an int representing the result. 0 for no issue, and -1 
-        if an exception occured."""
+        if an exception occured.
+        
+        Precondition: client is connected to a socket."""
         try:
             self.client.sendall((self.memory_request + self.input_request).encode())
 
@@ -79,7 +85,7 @@ class Client:
 
         if not addr in self.address_list:
             self.address_list.append(str(addr))
-            self.received_memory += str(addr) + ":-;"
+            self.received_memory += str(addr) + ":-1;"
 
     def add_address_range(self, start, end):
         """Precondition: `start` <= `end`.
@@ -94,12 +100,14 @@ class Client:
             self.add_address(addr)
 
     def get_memory(self) -> list:
-        """Gets the latest memory data from the emulator. This will return
-        latest value received for each address paired with the address it was read from. 
-        Returns 'int(addr):-' if there has been no data received yet from an address, 
-        and 'int(addr):int(data)' representing the received data otherwise.
+        """Gets the latest memory data received from the external tool. 
+        
+        This will return a list of the latest values received from each address paired 
+        with the address it was read from, represented as:
 
-        Precondition: client is connected to a socket."""
+        `"addr:-"`, if there has been no data received yet from an address
+
+        `"addr:data"`, with both `addr` and `data` in decimal form."""
 
         self.memory_request = "MEMORY;" + ";".join(self.address_list) + "\n"
         self.address_list = []
@@ -108,9 +116,8 @@ class Client:
 
     def set_controller_input(self, a=False, b=False, up=False, down=False, right=False, left=False):
         """Sets the controller inputs to be executed in the emulator.
-        All inputs are set to False be default.
+        All inputs are set to `False` be default.
         The inputs are executed until a new controller input is sent.
-        Precondition: client is connected to a socket.
 
         `a` is the state of the A button
 
