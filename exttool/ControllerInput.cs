@@ -6,6 +6,11 @@ using BizHawk.Client.Common;
 namespace BirdsEye {
     public class ControllerInput {
         private bool[] _inputState = {false, false, false, false, false, false};
+        private Logging _log;
+
+        public ControllerInput(Logging log) {
+            _log = log;
+        }
 
         ///<summary>
         /// Execute the current input state in the emulator.

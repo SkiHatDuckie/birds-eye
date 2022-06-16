@@ -10,12 +10,14 @@ namespace BirdsEye {
         private NetworkStream? _clientStream;
         private int _port;
         private IPAddress _host;
+        private Logging _log;
 
         ///<summary>
         /// Create a socket server object that listens for 
         /// connections at a given port and address.
         ///</summary>
-        public SocketServer(string host, int port) {
+        public SocketServer(Logging log, string host, int port) {
+            _log = log;
             _port = port;
             _host = IPAddress.Parse(host);
             _server = new TcpListener(_host, _port);
@@ -25,6 +27,7 @@ namespace BirdsEye {
         /// Accept a connection request from a python client.
         ///</summary>
         public void AcceptConnections() {
+            _log.Write(1, "Accepting connection request from python client.");
             _server.Start();
             _client = _server.AcceptTcpClient();
             _clientStream = _client.GetStream();
@@ -45,6 +48,7 @@ namespace BirdsEye {
         /// the socket stream occurred.
         ///</summary>
         public string[] GetRequests() {
+            _log.Write(0, "Receiving messages from python client.");
             if (_clientStream == null) {
                 return new string[] {"ERR"};
             }
@@ -55,6 +59,7 @@ namespace BirdsEye {
 
                 return Encoding.ASCII.GetString(bytes, 0, i).Split('\n');
             } catch {
+                _log.Write(3, "Something went wrong when trying to read received input.");
                 return new string[] {"ERR"};
             }
         }
@@ -64,6 +69,7 @@ namespace BirdsEye {
         /// Precondition: python client is connected to the server.
         ///</summary>
         public void SendMessage(string msg) {
+            _log.Write(0, "Sending message to python client.");
             if (_clientStream == null) {
                 return;
             }
@@ -76,6 +82,7 @@ namespace BirdsEye {
         /// End communication with the connected python client.
         ///</summary>
         public void CloseConnection() {
+            _log.Write(1, "Closing socket connection with python client.");
             if (_client != null) {
                 _client.Close();
                 _client = null;
@@ -88,6 +95,7 @@ namespace BirdsEye {
         /// and then close all socket objects.
         ///</summary>
         public void CloseAll() {
+            _log.Write(1, "Closing all socket objects.");
             _server.Stop();
             CloseConnection();
         }

@@ -10,22 +10,19 @@ using BizHawk.Client.EmuHawk;
 namespace BirdsEye {
     [ExternalTool("BirdsEye")]
     public class CustomMainForm : ToolFormBase, IExternalToolForm {
-        /// <remarks>
+        ///<remarks>
 		/// <see cref="ApiContainer"/> can be used as a shorthand for accessing 
         /// the various APIs, more like the Lua syntax.
-		/// </remarks>
+		///</remarks>
 		public ApiContainer? _apiContainer { get; set; }
-
 		private ApiContainer APIs => _apiContainer ?? throw new NullReferenceException();
 
-        private SocketServer _server = new SocketServer("127.0.0.1", 8080);
-        private Thread _commThread;
-
-        private Memory _memory = new Memory();
-
-        private ControllerInput _input = new ControllerInput();
-
+        private static Logging _log = new Logging(1);
+        private SocketServer _server = new SocketServer(_log, "127.0.0.1", 8080);
+        private Memory _memory = new Memory(_log);
+        private ControllerInput _input = new ControllerInput(_log);
         private bool _commandeer = false;
+        private Thread _commThread;
 
         private Label _lblRomName;
         private Label _lblCommMode;
@@ -40,6 +37,7 @@ namespace BirdsEye {
         /// Code is executed only once (when EmuHawk.exe is launched).
         ///</summary>
         public CustomMainForm() {
+            _log.Write(1, "Initializing main form.");
             this.FormClosing += OnFormClosing;
 
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
@@ -118,10 +116,11 @@ namespace BirdsEye {
         private void ProcessRequests() {
             string[] msgs = _server.GetRequests();
             if (msgs[0] == "ERR") {
+                _log.Write(2, "Disconnecting from python client due to bad request.");
                 HandleDisconnect();
             }
-            string response = "";
 
+            string response = "";
             foreach (string msg in msgs) {
                 if (msg.Length > 6 && msg.Substring(0, 6).Equals("MEMORY")) {
                     if (msg != "MEMORY;") {
@@ -207,12 +206,15 @@ namespace BirdsEye {
         ///</summary>
         private void btnChangeCommModeOnClick(object sender, EventArgs e) {
             if (!_server.IsConnected() && !_commandeer) {
+                _log.Write(2, "Cannot switch to commandeer when no script is connected.");
                 _lblError.Text = "ERROR: No script is connected";
                 return;
             } else if (!_commandeer) {
+                _log.Write(1, "Communication mode set to commandeer.");
                 _commandeer = true;
                 _lblCommMode.Text = "Communication Mode: Commandeer";
             } else {
+                _log.Write(1, "Communication mode set to manual.");
                 _commandeer = false;
                 _lblCommMode.Text = "Communication Mode: Manual";
             }
@@ -224,6 +226,7 @@ namespace BirdsEye {
         /// Attempts to abort out of any thread, regardless of state.
         ///</summary>
         private void OnFormClosing(object sender, FormClosingEventArgs e) {
+            _log.Write(1, "Gracefully closing external tool.");
             // TODO: Is this an ok approach to terminating the thread?
             try {
                 _commThread.Abort();
