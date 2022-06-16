@@ -9,12 +9,15 @@ PORT = 8080
 
 if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
+    memory = bird.Memory()
+    controller_input = bird.ControllerInput()
+    bizhawk_objects = [memory, controller_input]
 
     # Add some arbitrary addresses to read from.
     # All addresses must be added before calling bird.client.connect().
-    client.add_address(0x000E)
-    client.add_address(0x001D)
-    client.add_address_range(0x0100, 0x010A)
+    memory.add_address(0x000E)
+    memory.add_address(0x001D)
+    memory.add_address_range(0x0100, 0x010A)
 
     client.connect()
     print("Conencting to server at {} on port {}.".format(HOST, PORT))
@@ -28,29 +31,27 @@ if __name__ == "__main__":
     while not close_attempt:
         cnt = 0
 
-        # If connection lost, complain roughly every 10 seconds until user
-        # gets the hint that something is wrong with the external tool.
+        # If connection lost, attempt to reconnect every 10 seconds.
         while not client.is_connected():
             print("Connection lost! Attempting to reconnect in 10 seconds...")
             time.sleep(10)
             client.connect()
 
         while client.is_connected():
-            memory = client.get_memory()
-            print([data for data in memory])
+            print([data for data in memory.get_memory()])
 
-            client.set_controller_input(right=True)
+            controller_input.set_controller_input(right=True)
             
-            # Must be called in order to send requests to the external tool 
-            # and process data received from the external tool.
-            res = client.send_requests()
+            # Sending requests to the external tool.
+            client.send_requests(bizhawk_objects)
 
-            if res == -1:
-                break
+            # Processing responses from external tool.
+            responses = client.get_responses()
+            memory.process_responses(responses)
 
             cnt += 1
 
             # After 1000 responses are received, break from main loop and end test.
             if cnt >= 1000:
-                client.send_close_request()
+                client.close()
                 close_attempt = True

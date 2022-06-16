@@ -48,14 +48,14 @@ namespace BirdsEye {
         /// the socket stream occurred.
         ///</summary>
         public string[] GetRequests() {
-            _log.Write(0, "Receiving messages from python client.");
             if (_clientStream == null) {
                 return new string[] {"ERR"};
             }
 
-            Byte[] bytes = new Byte[1024];
+            Byte[] bytes = new Byte[2048];
             try {
                 int i = _clientStream.Read(bytes, 0, bytes.Length);
+                _log.Write(0, $"Received the following message: {Encoding.ASCII.GetString(bytes, 0, i)}");
 
                 return Encoding.ASCII.GetString(bytes, 0, i).Split('\n');
             } catch {
@@ -69,7 +69,7 @@ namespace BirdsEye {
         /// Precondition: python client is connected to the server.
         ///</summary>
         public void SendMessage(string msg) {
-            _log.Write(0, "Sending message to python client.");
+            _log.Write(0, $"Sending message: {msg}");
             if (_clientStream == null) {
                 return;
             }
