@@ -10,14 +10,14 @@ using BizHawk.Client.EmuHawk;
 namespace BirdsEye {
     [ExternalTool("BirdsEye")]
     public class CustomMainForm : ToolFormBase, IExternalToolForm {
-        ///<remarks>
+        /// <remarks>
 		/// <see cref="ApiContainer"/> can be used as a shorthand for accessing 
         /// the various APIs, more like the Lua syntax.
-		///</remarks>
+		/// </remarks>
 		public ApiContainer? _apiContainer { get; set; }
 		private ApiContainer APIs => _apiContainer ?? throw new NullReferenceException();
 
-        private static Logging _log = new Logging(0);
+        private static Logging _log = new Logging(1);
         private SocketServer _server = new SocketServer(_log, "127.0.0.1", 8080);
         private Memory _memory = new Memory(_log);
         private ControllerInput _input = new ControllerInput(_log);
@@ -33,10 +33,10 @@ namespace BirdsEye {
 
         protected override string WindowTitleStatic => "BirdsEye";
 
-        ///<summary>
+        /// <summary>
         /// Main form constructor.<br/>
         /// Code is executed only once (when EmuHawk.exe is launched).
-        ///</summary>
+        /// </summary>
         public CustomMainForm() {
             _log.Write(1, "Initializing main form.");
             this.FormClosing += OnFormClosing;
@@ -88,32 +88,32 @@ namespace BirdsEye {
             _btnChangeCommMode.Click += btnChangeCommModeOnClick;
         }
 
-        ///<summary>
+        /// <summary>
         /// Executed once after the constructor, and again every time a rom is
         /// loaded or reloaded.
-        ///</summary>
+        /// </summary>
         public override void Restart() {
             DisplayLoadedRom();
         }
 
-        ///<summary>
+        /// <summary>
         /// Executed before every frame.
-        ///</summary>
+        /// </summary>
         protected override void UpdateBefore() {
             UpdateConnectionStatus();
-            if (_server.IsConnected()) {
+            if (_server.IsConnected() && APIs.GameInfo.GetRomName() != "Null") {
                 ProcessRequests();
-            }
-            if (_commandeer) {
-                _input.ExecuteInput(APIs);
+                if (_commandeer) {
+                    _input.ExecuteInput(APIs);
+                }
             }
         }
 
-        ///<summary>
+        /// <summary>
         /// Process requests received by `_server`.
         /// Disconnects python client if an error occurs when receiving data, or
         /// if the python client sends a request for the connection to be closed.
-        ///</summary>
+        /// </summary>
         private void ProcessRequests() {
             string[] msgs = _server.GetRequests();
             if (msgs[0] == "ERR") {
@@ -141,9 +141,9 @@ namespace BirdsEye {
             _server.SendMessage(response);
         }
 
-        ///<summary>
+        /// <summary>
         /// Change the text of `_lblRomName` to display the current rom.
-        ///</summary>
+        /// </summary>
         private void DisplayLoadedRom() {
             if (APIs.GameInfo.GetRomName() != "Null") {
                 _lblRomName.Text = $"Currently loaded: {APIs.GameInfo.GetRomName()}";
@@ -152,10 +152,10 @@ namespace BirdsEye {
             }
         }
 
-        ///<summary>
+        /// <summary>
         /// Determine if all characters in `str` are valid hexadecimal digits.<br/>
         /// Returns false if an invalid digit is found, otherwise this returns true.
-        ///</summary>
+        /// </summary>
         private bool IsHexadecimal(string str) {
             string hexadecimalChars = "0987654321ABCDEFabcdef";
             foreach (char ch in str) {
@@ -166,10 +166,10 @@ namespace BirdsEye {
             return true;
         }
 
-        ///<summary>
+        /// <summary>
         /// Update the current status of the socket connection and update
         /// `_lblConnectionStatus` accordingly.
-        ///</summary>
+        /// </summary>
         private void UpdateConnectionStatus() {
             if (_server.IsConnected()) {
                 _lblConnectionStatus.Text = "Script found";
@@ -184,11 +184,11 @@ namespace BirdsEye {
             }
         }
 
-        ///<summary>
+        /// <summary>
         /// Executed when the socket connection abrupty ends, or when requested
         /// by the python client.<br/>
         /// Displays an error message in the external tool and cleans up socket resources.
-        ///</summary>
+        /// </summary>
         private void HandleDisconnect() {
             _server.CloseConnection();
             UpdateConnectionStatus();
@@ -202,32 +202,36 @@ namespace BirdsEye {
             _commThread.Start();
         }
 
-        ///<summary>
+        /// <summary>
         /// Change the communication mode from manual -> commandeer, or commandeer -> manual.<br/>
         /// Displays an error if the user attempts to switch to commandeer mode before a
-        /// python client is connected.
-        ///</summary>
+        /// python client is connected, or if a ROM is not loaded yet.
+        /// </summary>
         private void btnChangeCommModeOnClick(object sender, EventArgs e) {
-            if (!_server.IsConnected() && !_commandeer) {
+            if (!_server.IsConnected()) {
                 _log.Write(2, "Cannot switch to commandeer when no script is connected.");
                 _lblError.Text = "ERROR: No script is connected";
-                return;
-            } else if (!_commandeer) {
-                _log.Write(1, "Communication mode set to commandeer.");
-                _commandeer = true;
-                _lblCommMode.Text = "Communication Mode: Commandeer";
+            } else if (APIs.GameInfo.GetRomName() == "Null") {
+                _log.Write(2, "Cannot switch to commandeer when no ROM has been loaded.");
+                _lblError.Text = "ERROR: No ROM has been loaded";
             } else {
-                _log.Write(1, "Communication mode set to manual.");
-                _commandeer = false;
-                _lblCommMode.Text = "Communication Mode: Manual";
+                if (!_commandeer) {
+                    _log.Write(1, "Communication mode set to commandeer.");
+                    _commandeer = true;
+                    _lblCommMode.Text = "Communication Mode: Commandeer";
+                } else {
+                    _log.Write(1, "Communication mode set to manual.");
+                    _commandeer = false;
+                    _lblCommMode.Text = "Communication Mode: Manual";
+                }
+                _lblError.Text = "";
             }
-            _lblError.Text = "";
         }
 
-        ///<summary>
+        /// <summary>
         /// Close any resources and threads before closing the application.
         /// Attempts to abort out of any thread, regardless of state.
-        ///</summary>
+        /// </summary>
         private void OnFormClosing(object sender, FormClosingEventArgs e) {
             _log.Write(1, "Gracefully closing external tool.");
             // TODO: Is this an ok approach to terminating the thread?
