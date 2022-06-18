@@ -21,6 +21,7 @@ namespace BirdsEye {
         private SocketServer _server = new SocketServer(_log, "127.0.0.1", 8080);
         private Memory _memory = new Memory(_log);
         private ControllerInput _input = new ControllerInput(_log);
+        private Emulation _emulation = new Emulation(_log);
         private bool _commandeer = false;
         private Thread _commThread;
 
@@ -132,6 +133,8 @@ namespace BirdsEye {
                     response += "INPUT;\n";
                 } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("CLOSE")) {
                     HandleDisconnect();
+                } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("FRAME")) {
+                   response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
                 }
             }
 

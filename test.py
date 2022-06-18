@@ -9,15 +9,17 @@ PORT = 8080
 
 if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
+
     memory = bird.Memory()
     controller_input = bird.ControllerInput()
-    bizhawk_objects = [memory, controller_input]
+    emulation = bird.Emulation()
+    bizhawk_objects = [memory, controller_input, emulation]
 
     # Add some arbitrary addresses to read from.
-    # All addresses must be added before calling bird.client.connect().
-    memory.add_address(0x000E)
-    memory.add_address(0x001D)
-    memory.add_address_range(0x0100, 0x010A)
+    # All addresses must be added before calling birdseye.client.connect().
+    memory.add_address(0x00EE)
+    memory.add_address(0x002D)
+    memory.add_address_range(0x0200, 0x020A)
 
     client.connect()
     print("Conencting to server at {} on port {}.".format(HOST, PORT))
@@ -38,16 +40,20 @@ if __name__ == "__main__":
             client.connect()
 
         while client.is_connected():
-            print([data for data in memory.get_memory()])
-
-            controller_input.set_controller_input(right=True)
-            
             # Sending requests to the external tool.
+            memory.request_memory()
+            controller_input.set_controller_input(right=True)
+            emulation.request_framecount()
             client.send_requests(bizhawk_objects)
 
             # Processing responses from external tool.
             responses = client.get_responses()
             memory.process_responses(responses)
+            emulation.process_responses(responses)
+
+            print("Frame:" + str(emulation.framecount) + ": " \
+                  + " ".join([data for data in memory.get_memory()])
+            )
 
             cnt += 1
 

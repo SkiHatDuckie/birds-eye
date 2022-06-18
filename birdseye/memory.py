@@ -24,6 +24,11 @@ class Memory:
         Precondition: `start` <= `end`."""
         for addr in range(int(start), int(end) + 1):
             self.add_address(addr)
+    
+    def request_memory(self):
+        """Requests for the latest memory data from the external tool."""
+        self.request = "MEMORY;" + ";".join(self.address_list) + "\n"
+        self.address_list = []
 
     def get_memory(self) -> list:
         """Gets the latest memory data received from the external tool. 
@@ -34,8 +39,6 @@ class Memory:
         `"addr:-1"`, if there has been no data received yet from an address
 
         `"addr:data"`, with both `addr` and `data` in decimal form."""
-        self.request = "MEMORY;" + ";".join(self.address_list) + "\n"
-        self.address_list = []
         return self.received_memory.split(";")
     
     def process_responses(self, responses):
