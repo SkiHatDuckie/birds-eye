@@ -17,7 +17,7 @@ namespace BirdsEye {
 		public ApiContainer? _apiContainer { get; set; }
 		private ApiContainer APIs => _apiContainer ?? throw new NullReferenceException();
 
-        private static Logging _log = new Logging(1);
+        private static Logging _log = new Logging(0);
         private SocketServer _server = new SocketServer(_log, "127.0.0.1", 8080);
         private Memory _memory = new Memory(_log);
         private ControllerInput _input = new ControllerInput(_log);
@@ -234,7 +234,6 @@ namespace BirdsEye {
         /// </summary>
         private void OnFormClosing(object sender, FormClosingEventArgs e) {
             _log.Write(1, "Gracefully closing external tool.");
-            // TODO: Is this an ok approach to terminating the thread?
             try {
                 _commThread.Abort();
             } catch {}
