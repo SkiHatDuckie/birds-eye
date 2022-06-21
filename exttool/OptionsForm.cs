@@ -12,6 +12,11 @@ namespace BirdsEye {
         private TextBox _txtPort;
         private GroupBox _grpSocketAddress;
 
+        private Label _lblLogLevel;
+        private TextBox _txtLogLevel;
+        private Label _lblLogLevelRange;
+        private GroupBox _grpLogging;
+
         private Label _lblSubmit;
         private Button _btnSubmit;
         private Label _lblError;
@@ -47,6 +52,26 @@ namespace BirdsEye {
                 Location = new Point(10, 0),
                 AutoSize = true
             };
+            _lblLogLevel = new Label {
+                Text = "Minimum Log Level:",
+                Location = new Point(15, 20),
+                AutoSize = true
+            };
+            _txtLogLevel = new TextBox {
+                Text = _config.logLevel.ToString(),
+                Location = new Point(15, 40),
+                AutoSize = true
+            };
+            _lblLogLevelRange = new Label {
+                Text = "0 (debug) - 4 (crash)",
+                Location = new Point(15, 65),
+                AutoSize = true
+            };
+            _grpLogging = new GroupBox {
+                Text = "Logging",
+                Location = new Point(10, 100),
+                AutoSize = true
+            };
             _lblSubmit = new Label {
                 Text = "",
                 ForeColor = Color.Blue,
@@ -70,7 +95,12 @@ namespace BirdsEye {
             _grpSocketAddress.Controls.Add(_lblPort);
             _grpSocketAddress.Controls.Add(_txtHost);
             _grpSocketAddress.Controls.Add(_txtPort);
+            _grpLogging.FlatStyle = FlatStyle.Flat;
+            _grpLogging.Controls.Add(_lblLogLevel);
+            _grpLogging.Controls.Add(_txtLogLevel);
+            _grpLogging.Controls.Add(_lblLogLevelRange);
             Controls.Add(_grpSocketAddress);
+            Controls.Add(_grpLogging);
             Controls.Add(_lblSubmit);
             Controls.Add(_btnSubmit);
             Controls.Add(_lblError);
@@ -85,7 +115,9 @@ namespace BirdsEye {
         private void btnSubmitOnClick(object sender, EventArgs e) {
             _config.host = _txtHost.Text;
             _config.port = Convert.ToInt32(_txtPort.Text);
+            _config.logLevel = Convert.ToInt32(_txtLogLevel.Text);
             _config.UpdateConfigs();
+            _lblSubmit.Text = "Submitted!";
         }
     }
 }

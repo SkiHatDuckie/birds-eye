@@ -42,7 +42,7 @@ namespace BirdsEye {
         /// Code is executed only once (when EmuHawk.exe is launched).
         /// </summary>
         public CustomMainForm() {
-            _log = new Logging(0);
+            _log = new Logging(_config.logLevel);
             _server = new SocketServer(_log, _config.host, _config.port);
             _memory = new Memory(_log);
             _input = new ControllerInput(_log);

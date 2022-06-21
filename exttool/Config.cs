@@ -7,6 +7,7 @@ namespace BirdsEye {
         // Default values
         public string host = "127.0.0.1";
         public int port = 8080;
+        public int logLevel = 0;
 
         public Config() {
             if (!File.Exists("birdconfig.txt")) {
@@ -22,7 +23,8 @@ namespace BirdsEye {
         private byte[] FormatConfigFields() {
             return new UTF8Encoding(true).GetBytes(
                 "host=" + host + "\n" +
-                "port=" + port.ToString() + "\n"
+                "port=" + port.ToString() + "\n" +
+                "logLevel=" + logLevel.ToString()
             );
         }
 
@@ -48,6 +50,7 @@ namespace BirdsEye {
                 string[] configs = data.GetString(bytes).Split('\n');
                 host = configs[0].Substring(configs[0].IndexOf('=') + 1);
                 port = Convert.ToInt32(configs[1].Substring(configs[1].IndexOf('=') + 1));
+                logLevel = Convert.ToInt32(configs[2].Substring(configs[2].IndexOf('=') + 1));
             }
         }
 
