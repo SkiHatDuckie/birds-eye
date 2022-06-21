@@ -56,10 +56,10 @@ namespace BirdsEye {
 
             Byte[] bytes = new Byte[2048];
             try {
-                int msg = _clientStream.Read(bytes, 0, bytes.Length);
-                _log.Write(0, $"Received the following message: {Encoding.ASCII.GetString(bytes, 0, msg)}");
+                int numBytes = _clientStream.Read(bytes, 0, bytes.Length);
+                _log.Write(0, $"Received the following message: {Encoding.ASCII.GetString(bytes, 0, numBytes)}");
 
-                return Encoding.ASCII.GetString(bytes, 0, msg).Split('\n');
+                return Encoding.ASCII.GetString(bytes, 0, numBytes).Split('\n');
             } catch {
                 _log.Write(3, "Something went wrong when trying to read received input.");
                 return new string[] {"ERR"};

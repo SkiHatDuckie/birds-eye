@@ -17,14 +17,18 @@ namespace BirdsEye {
 		public ApiContainer? _apiContainer { get; set; }
 		private ApiContainer APIs => _apiContainer ?? throw new NullReferenceException();
 
-        private static Logging _log = new Logging(0);
-        private SocketServer _server = new SocketServer(_log, "127.0.0.1", 8080);
-        private Memory _memory = new Memory(_log);
-        private ControllerInput _input = new ControllerInput(_log);
-        private Emulation _emulation = new Emulation(_log);
+        private Config _config = new Config();
+        private Logging _log;
+        private SocketServer _server;
+        private Memory _memory;
+        private ControllerInput _input;
+        private Emulation _emulation;
+
         private bool _commandeer = false;
         private Thread _commThread;
 
+        private MenuStrip _mainFormMenu;
+        private ToolStripMenuItem _optionSubMenu;
         private Label _lblRomName;
         private Label _lblCommMode;
         private Button _btnChangeCommMode;
@@ -38,46 +42,59 @@ namespace BirdsEye {
         /// Code is executed only once (when EmuHawk.exe is launched).
         /// </summary>
         public CustomMainForm() {
+            _log = new Logging(0);
+            _server = new SocketServer(_log, _config.host, _config.port);
+            _memory = new Memory(_log);
+            _input = new ControllerInput(_log);
+            _emulation = new Emulation(_log);
+
             _log.Write(1, "Initializing main form.");
             this.FormClosing += OnFormClosing;
 
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
             _commThread.Start();
-            
+
             ClientSize = new Size(480, 320);
             SuspendLayout();
 
-            // Rom Label
             _lblRomName = new Label {
                 AutoSize = true,
-                Location = new Point(0, 0),
+                Location = new Point(0, 30),
             };
-            // Communication Mode Label
             _lblCommMode = new Label {
                 AutoSize = true,
-                Location = new Point(240, 0),
+                Location = new Point(240, 30),
                 Text = "Communication Mode: Manual"
             };
-            // Communication Mode Button
             _btnChangeCommMode = new Button {
-                Location = new Point(240, 20),
+                Location = new Point(240, 50),
                 Size = new Size(100, 25),
                 Text = "Change Mode"
             };
-            // Connection Status Label
             _lblConnectionStatus = new Label {
                 AutoSize = true,
-                Location = new Point(240, 50),
+                Location = new Point(240, 80),
                 Text = "No script found",
                 ForeColor = Color.Red
             };
-            // Error Label
             _lblError = new Label {
                 AutoSize = true,
                 Location = new Point(0, 300),
                 ForeColor = Color.Red
             };
+            _optionSubMenu = new ToolStripMenuItem {
+                Size = new System.Drawing.Size(50, 25),
+                Text = "&Options"
+            };
+            _mainFormMenu = new MenuStrip {
+                Location = new Point(0, 0),
+                Size = new System.Drawing.Size(this.Width, 25),
+                TabIndex = 0,
+                Text = "menuStrip1",
+            };
 
+            _mainFormMenu.Items.Add(_optionSubMenu);
+            Controls.Add(_mainFormMenu);
             Controls.Add(_lblRomName);
             Controls.Add(_lblCommMode);
             Controls.Add(_btnChangeCommMode);
@@ -85,6 +102,7 @@ namespace BirdsEye {
             Controls.Add(_lblError);
             ResumeLayout();
 
+            _optionSubMenu.Click += optionSubMenuOnClick;
             _btnChangeCommMode.Click += btnChangeCommModeOnClick;
         }
 
@@ -226,6 +244,14 @@ namespace BirdsEye {
                 }
                 _lblError.Text = "";
             }
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        private void optionSubMenuOnClick(object sender, EventArgs e) {
+            OptionsForm options = new OptionsForm(_config);
+            options.ShowDialog();
         }
 
         /// <summary>

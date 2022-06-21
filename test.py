@@ -4,7 +4,7 @@ import time
 # External tool connects to this address and port 
 # TODO: Add way in external tool to set port and address
 HOST = "127.0.0.1"
-PORT = 8080
+PORT = 8081
 
 
 if __name__ == "__main__":
