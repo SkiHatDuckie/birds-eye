@@ -51,8 +51,8 @@ namespace BirdsEye {
             _log.Write(1, "Initializing main form.");
             this.FormClosing += OnFormClosing;
 
-            _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
-            _commThread.Start();
+            _commThread = new Thread(new ParameterizedThreadStart(_server.AcceptConnections));
+            _commThread.Start(_config);
 
             ClientSize = new Size(480, 320);
             SuspendLayout();
@@ -216,8 +216,8 @@ namespace BirdsEye {
 
             _memory.ClearAddresses();
 
-            _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
-            _commThread.Start();
+            _commThread = new Thread(new ParameterizedThreadStart(_server.AcceptConnections));
+            _commThread.Start(_config);
         }
 
         /// <summary>

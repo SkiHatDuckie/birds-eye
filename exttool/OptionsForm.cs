@@ -17,6 +17,10 @@ namespace BirdsEye {
         private Label _lblLogLevelRange;
         private GroupBox _grpLogging;
 
+        private Label _lblTimeout;
+        private TextBox _txtTimeout;
+        private GroupBox _grpSocket;
+
         private Label _lblSubmit;
         private Button _btnSubmit;
         private Label _lblError;
@@ -72,6 +76,21 @@ namespace BirdsEye {
                 Location = new Point(10, 100),
                 AutoSize = true
             };
+            _lblTimeout = new Label {
+                Text = "Socket Timeout (ms):",
+                Location = new Point(15, 20),
+                AutoSize = true
+            };
+            _txtTimeout = new TextBox {
+                Text = _config.socketTimeout.ToString(),
+                Location = new Point(15, 40),
+                AutoSize = true
+            };
+            _grpSocket = new GroupBox {
+                Text = "Sockets",
+                Location = new Point(225, 0),
+                AutoSize = true
+            };
             _lblSubmit = new Label {
                 Text = "",
                 ForeColor = Color.Blue,
@@ -99,8 +118,12 @@ namespace BirdsEye {
             _grpLogging.Controls.Add(_lblLogLevel);
             _grpLogging.Controls.Add(_txtLogLevel);
             _grpLogging.Controls.Add(_lblLogLevelRange);
+            _grpSocket.FlatStyle = FlatStyle.Flat;
+            _grpSocket.Controls.Add(_lblTimeout);
+            _grpSocket.Controls.Add(_txtTimeout);
             Controls.Add(_grpSocketAddress);
             Controls.Add(_grpLogging);
+            Controls.Add(_grpSocket);
             Controls.Add(_lblSubmit);
             Controls.Add(_btnSubmit);
             Controls.Add(_lblError);
@@ -116,6 +139,7 @@ namespace BirdsEye {
             _config.host = _txtHost.Text;
             _config.port = Convert.ToInt32(_txtPort.Text);
             _config.logLevel = Convert.ToInt32(_txtLogLevel.Text);
+            _config.socketTimeout = Convert.ToInt32(_txtTimeout.Text);
             _config.UpdateConfigs();
             _lblSubmit.Text = "Submitted!";
         }

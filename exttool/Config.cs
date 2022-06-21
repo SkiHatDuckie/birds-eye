@@ -8,6 +8,7 @@ namespace BirdsEye {
         public string host = "127.0.0.1";
         public int port = 8080;
         public int logLevel = 0;
+        public int socketTimeout = 10000;
 
         public Config() {
             if (!File.Exists("birdconfig.txt")) {
@@ -24,7 +25,8 @@ namespace BirdsEye {
             return new UTF8Encoding(true).GetBytes(
                 "host=" + host + "\n" +
                 "port=" + port.ToString() + "\n" +
-                "logLevel=" + logLevel.ToString()
+                "logLevel=" + logLevel.ToString() + "\n" +
+                "socketTimeout" + socketTimeout.ToString()
             );
         }
 
@@ -51,6 +53,7 @@ namespace BirdsEye {
                 host = configs[0].Substring(configs[0].IndexOf('=') + 1);
                 port = Convert.ToInt32(configs[1].Substring(configs[1].IndexOf('=') + 1));
                 logLevel = Convert.ToInt32(configs[2].Substring(configs[2].IndexOf('=') + 1));
+                socketTimeout = Convert.ToInt32(configs[3].Substring(configs[3].IndexOf('=') + 1));
             }
         }
 

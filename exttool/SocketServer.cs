@@ -26,12 +26,12 @@ namespace BirdsEye {
         /// <summary>
         /// Accept a connection request from a python client.
         /// </summary>
-        public void AcceptConnections() {
+        public void AcceptConnections(object config) {
             _log.Write(1, "Accepting connection request from python client.");
             _server.Start();
             _client = _server.AcceptTcpClient();
             _clientStream = _client.GetStream();
-            _client.ReceiveTimeout = 10000;
+            _client.ReceiveTimeout = ((Config) config).socketTimeout;
             _client.SendTimeout = 10000;
             _server.Stop();
         }
