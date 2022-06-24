@@ -13,10 +13,11 @@ if __name__ == "__main__":
     memory = bird.Memory()
     controller_input = bird.ControllerInput()
     emulation = bird.Emulation()
-    bizhawk_objects = [memory, controller_input, emulation]
+    external_tool = bird.ExternalTool()
+    bizhawk_objects = [memory, controller_input, emulation, external_tool]
 
     # Add some arbitrary addresses to read from.
-    # All addresses must be added before calling birdseye.client.connect().
+    # All addresses must be added before calling birdseye.Client.connect().
     memory.add_address(0x00EE)
     memory.add_address(0x002D)
     memory.add_address_range(0x0200, 0x020A)
@@ -44,6 +45,8 @@ if __name__ == "__main__":
             memory.request_memory()
             controller_input.set_controller_input(right=True)
             emulation.request_framecount()
+            if cnt == 0:
+                external_tool.set_commandeer(True)
             client.send_requests(bizhawk_objects)
 
             # Processing responses from external tool.

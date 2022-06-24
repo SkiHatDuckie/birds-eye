@@ -26,7 +26,7 @@ namespace BirdsEye {
                 "host=" + host + "\n" +
                 "port=" + port.ToString() + "\n" +
                 "logLevel=" + logLevel.ToString() + "\n" +
-                "socketTimeout" + socketTimeout.ToString()
+                "socketTimeout=" + socketTimeout.ToString()
             );
         }
 

@@ -153,6 +153,14 @@ namespace BirdsEye {
                     HandleDisconnect();
                 } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("FRAME")) {
                    response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
+                } else if (msg.Length > 10 && msg.Substring(0, 10).Equals("COMMANDEER")) {
+                    if (CanCommandeer()) {
+                        if (msg.Substring(11, 4) == "True") {
+                            EnableCommandeer();
+                        } else {
+                            DisableCommandeer();
+                        }
+                    }
                 }
             }
 
@@ -192,7 +200,9 @@ namespace BirdsEye {
             if (_server.IsConnected()) {
                 _lblConnectionStatus.Text = "Script found";
                 _lblConnectionStatus.ForeColor = Color.Blue;
-                _lblError.Text = "";
+                if (APIs.GameInfo.GetRomName() != "Null") {
+                    _lblError.Text = "";
+                }
                 if (!_commThread.IsAlive) {
                     _commThread.Join();
                 }
@@ -221,33 +231,58 @@ namespace BirdsEye {
         }
 
         /// <summary>
+        /// Checks if external tool should switch to commandeer.
+        /// </summary>
+        private bool CanCommandeer() {
+            if (!_server.IsConnected()) {
+                _log.Write(2, "Cannot switch to commandeer when no script is connected.");
+                _lblError.Text = "ERROR: No script is connected";
+                return false;
+            } else if (APIs.GameInfo.GetRomName() == "Null") {
+                _log.Write(2, "Cannot switch to commandeer when no ROM has been loaded.");
+                _lblError.Text = "ERROR: No ROM has been loaded";
+                return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// Switches the communication mode to commandeer.
+        /// </summary>
+        private void EnableCommandeer() {
+            _log.Write(1, "Communication mode set to commandeer.");
+            _commandeer = true;
+            _lblCommMode.Text = "Communication Mode: Commandeer";
+            _lblError.Text = "";
+        }
+
+        /// <summary>
+        /// Switches the communication mode to manual.
+        /// </summary>
+        private void DisableCommandeer() {
+            _log.Write(1, "Communication mode set to manual.");
+            _commandeer = false;
+            _lblCommMode.Text = "Communication Mode: Manual";
+            _lblError.Text = "";
+        }
+
+        /// <summary>
         /// Change the communication mode from manual -> commandeer, or commandeer -> manual.<br/>
         /// Displays an error if the user attempts to switch to commandeer mode before a
         /// python client is connected, or if a ROM is not loaded yet.
         /// </summary>
         private void btnChangeCommModeOnClick(object sender, EventArgs e) {
-            if (!_server.IsConnected()) {
-                _log.Write(2, "Cannot switch to commandeer when no script is connected.");
-                _lblError.Text = "ERROR: No script is connected";
-            } else if (APIs.GameInfo.GetRomName() == "Null") {
-                _log.Write(2, "Cannot switch to commandeer when no ROM has been loaded.");
-                _lblError.Text = "ERROR: No ROM has been loaded";
-            } else {
+            if (CanCommandeer()) {
                 if (!_commandeer) {
-                    _log.Write(1, "Communication mode set to commandeer.");
-                    _commandeer = true;
-                    _lblCommMode.Text = "Communication Mode: Commandeer";
+                    EnableCommandeer();
                 } else {
-                    _log.Write(1, "Communication mode set to manual.");
-                    _commandeer = false;
-                    _lblCommMode.Text = "Communication Mode: Manual";
+                    DisableCommandeer();
                 }
-                _lblError.Text = "";
             }
         }
 
         /// <summary>
-        /// 
+        /// Opens an instance of the options form.
         /// </summary>
         private void optionSubMenuOnClick(object sender, EventArgs e) {
             OptionsForm options = new OptionsForm(_config);
