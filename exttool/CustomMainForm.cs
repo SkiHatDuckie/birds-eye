@@ -33,7 +33,7 @@ namespace BirdsEye {
         private Label _lblCommMode;
         private Button _btnChangeCommMode;
         private Label _lblConnectionStatus;
-        private Label _lblError;
+        private ListBox _lstError;
 
         protected override string WindowTitleStatic => "BirdsEye";
 
@@ -77,9 +77,9 @@ namespace BirdsEye {
                 Text = "No script found",
                 ForeColor = Color.Red
             };
-            _lblError = new Label {
-                AutoSize = true,
-                Location = new Point(0, 300),
+            _lstError = new ListBox {
+                Size = new Size(480, 100),
+                Location = new Point(0, 200),
                 ForeColor = Color.Red
             };
             _optionSubMenu = new ToolStripMenuItem {
@@ -99,7 +99,7 @@ namespace BirdsEye {
             Controls.Add(_lblCommMode);
             Controls.Add(_btnChangeCommMode);
             Controls.Add(_lblConnectionStatus);
-            Controls.Add(_lblError);
+            Controls.Add(_lstError);
             ResumeLayout();
 
             _optionSubMenu.Click += optionSubMenuOnClick;
@@ -154,12 +154,10 @@ namespace BirdsEye {
                 } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("FRAME")) {
                    response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
                 } else if (msg.Length > 10 && msg.Substring(0, 10).Equals("COMMANDEER")) {
-                    if (CanCommandeer()) {
-                        if (msg.Substring(11, 4) == "True") {
-                            EnableCommandeer();
-                        } else {
-                            DisableCommandeer();
-                        }
+                    if (msg.Substring(11, 4) == "True") {
+                        EnableCommandeer();
+                    } else {
+                        DisableCommandeer();
                     }
                 }
             }
@@ -200,9 +198,6 @@ namespace BirdsEye {
             if (_server.IsConnected()) {
                 _lblConnectionStatus.Text = "Script found";
                 _lblConnectionStatus.ForeColor = Color.Blue;
-                if (APIs.GameInfo.GetRomName() != "Null") {
-                    _lblError.Text = "";
-                }
                 if (!_commThread.IsAlive) {
                     _commThread.Join();
                 }
@@ -220,9 +215,8 @@ namespace BirdsEye {
         private void HandleDisconnect() {
             _server.CloseConnection();
             UpdateConnectionStatus();
-            _lblError.Text = "Connection with script has been stopped.";
-            _commandeer = false;
-            _lblCommMode.Text = "Communication Mode: Manual";
+            _lstError.Items.Add("WARNING: Connection with script has been stopped.");
+            DisableCommandeer();
 
             _memory.ClearAddresses();
 
@@ -236,11 +230,11 @@ namespace BirdsEye {
         private bool CanCommandeer() {
             if (!_server.IsConnected()) {
                 _log.Write(2, "Cannot switch to commandeer when no script is connected.");
-                _lblError.Text = "ERROR: No script is connected";
+                _lstError.Items.Add("ERROR: No script is connected.");
                 return false;
             } else if (APIs.GameInfo.GetRomName() == "Null") {
                 _log.Write(2, "Cannot switch to commandeer when no ROM has been loaded.");
-                _lblError.Text = "ERROR: No ROM has been loaded";
+                _lstError.Items.Add("ERROR: No ROM has been loaded.");
                 return false;
             }
             return true;
@@ -253,7 +247,6 @@ namespace BirdsEye {
             _log.Write(1, "Communication mode set to commandeer.");
             _commandeer = true;
             _lblCommMode.Text = "Communication Mode: Commandeer";
-            _lblError.Text = "";
         }
 
         /// <summary>
@@ -263,7 +256,6 @@ namespace BirdsEye {
             _log.Write(1, "Communication mode set to manual.");
             _commandeer = false;
             _lblCommMode.Text = "Communication Mode: Manual";
-            _lblError.Text = "";
         }
 
         /// <summary>
