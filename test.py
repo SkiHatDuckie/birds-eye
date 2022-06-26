@@ -4,23 +4,27 @@ import time
 # External tool connects to this address and port 
 # TODO: Add way in external tool to set port and address
 HOST = "127.0.0.1"
-PORT = 8080
+PORT = 8081
 
 
 if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
 
-    # Add some arbitrary addresses to read from.
-    # All addresses must be added before calling bird.client.connect().
-    client.add_address(0x000E)
-    client.add_address(0x001D)
-    client.add_address_range(0x0100, 0x010A)
+    memory = bird.Memory()
+    controller_input = bird.ControllerInput()
+    emulation = bird.Emulation()
+    external_tool = bird.ExternalTool()
+    bizhawk_objects = [memory, controller_input, emulation, external_tool]
 
     client.connect()
     print("Conencting to server at {} on port {}.".format(HOST, PORT))
 
-    close_attempt = False
+    # Add some arbitrary addresses to read from.
+    memory.add_address(0x0002)
+    memory.add_address(0x0032)
+    memory.add_address_range(0x0150, 0x015A)
 
+    close_attempt = False
     if not client.is_connected():
             print("Could not connect to external tool :[")
             close_attempt = True
@@ -28,29 +32,33 @@ if __name__ == "__main__":
     while not close_attempt:
         cnt = 0
 
-        # If connection lost, complain roughly every 10 seconds until user
-        # gets the hint that something is wrong with the external tool.
+        # If connection lost, attempt to reconnect every 10 seconds.
         while not client.is_connected():
             print("Connection lost! Attempting to reconnect in 10 seconds...")
             time.sleep(10)
             client.connect()
 
         while client.is_connected():
-            memory = client.get_memory()
-            print([data for data in memory])
+            # Sending requests to the external tool.
+            memory.request_memory()
+            controller_input.set_controller_input(right=True)
+            emulation.request_framecount()
+            if cnt == 0:
+                external_tool.set_commandeer(True)
+            client.send_requests(bizhawk_objects)
 
-            client.set_controller_input(right=True)
-            
-            # Must be called in order to send requests to the external tool 
-            # and process data received from the external tool.
-            res = client.send_requests()
+            # Processing responses from external tool.
+            responses = client.get_responses()
+            memory.process_responses(responses)
+            emulation.process_responses(responses)
 
-            if res == -1:
-                break
+            print("Frame:" + str(emulation.framecount) + ": " \
+                  + " ".join([data for data in memory.get_memory()])
+            )
 
             cnt += 1
 
             # After 1000 responses are received, break from main loop and end test.
             if cnt >= 1000:
-                client.send_close_request()
+                client.close()
                 close_attempt = True

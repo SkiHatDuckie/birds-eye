@@ -7,6 +7,11 @@ namespace BirdsEye {
     public class Memory {
         private List<long> _addressList = new List<long>();
         private List<int> _memoryList = new List<int>();
+        private Logging _log;
+
+        public Memory(Logging log) {
+            _log = log;
+        }
 
         ///<summary>
         /// Add a memory address to `_addressList`.<br/>
@@ -14,6 +19,7 @@ namespace BirdsEye {
         /// Precondition: `address` represents a valid hexadecimal value.
         ///</summary>
         private void AddAddress(long address) {
+            _log.Write(0, $"Adding address {address} to address list.");
             _addressList.Add(address);
             _memoryList.Add(-1);
         }
@@ -65,6 +71,7 @@ namespace BirdsEye {
         /// `_addressList` and `_memoryList`.
         ///</summary>
         public void ClearAddresses() {
+            _log.Write(0, "Clearing address and memory lists.");
             _addressList.Clear();
             _memoryList.Clear();
         }

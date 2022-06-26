@@ -1,138 +1,60 @@
-import socket;
+import socket
 
 
 class Client:
-    """A socket client object that will be used to
-    communicate with the external tool located at a set
-    port and address.
+    """A socket client used to communicate with the external tool 
+    located at a set port and address.
 
-    Use the BirdsEye external tool to get and set the port and
+    Use the external tool to get and set the port and
     address the server should listen in to.
 
     `ip` is the socket address
 
     `port` is the socket port number"""
-
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection_status = -1
 
-        self.address_list = []
-        self.memory_request = ""
         self.input_request = ""
-
-        self.received_memory = ""
 
     def connect(self):
         """Attempt to connect to the external tool.
         
         Call `Client.is_connected()` to see if the attempt was successful."""
-
         self.connection_status = self.client.connect_ex((self.ip, self.port))
     
-    def send_close_request(self):
+    def close(self):
         """Close socket connection with external tool and send a final message
         notifying the external tool before closing."""
-
-        self.client.sendall("CLOSE;\n".encode())
-        self.close_connection()
-
-    def close_connection(self):
-        """Close connection with external tool. 
-        
-        Set `Client.connection_status` to -1 (no connection)"""
-
+        try:
+            self.client.sendall("CLOSE;\n".encode())
+        except:
+            pass
         self.client.close()
         self.connection_status = -1
 
     def is_connected(self):
         """Returns true if client is connected to the external tool."""
-
-        if self.connection_status == 0:
-            return True
-        else:
-            return False
+        return self.connection_status == 0
     
-    def send_requests(self) -> int:
-        """Send requests to the external tool and receive data collected by
-        the external tool.
-        
-        Returns an int representing the result. 0 for no issue, and -1 
-        if an exception occured.
+    def send_requests(self, objects: list):
+        """Send requests from any birdseye object to the external tool.
         
         Precondition: client is connected to a socket."""
         try:
-            self.client.sendall((self.memory_request + self.input_request).encode())
-
-            responses = self.client.recv(2048).decode()
-            for response in responses.split("\n"):
-                if len(response) > 6 and response[0:6] == "MEMORY":
-                    self.received_memory = response[7:]
-            
-            return 0
+            self.client.sendall(("".join([obj.request for obj in objects])).encode())
         except:
-            self.close_connection()
-            
-            return -1
+            self.close()
     
-    def add_address(self, addr):
-        """Adds an address for the external tool to return.
+    def get_responses(self) -> str:
+        """Receive data collected by the external tool, and update each object in `objects` accordingly.
         
-        `addr` is a hexidecimal value representing the address to read from 
-        in the BizHawk emulator's memory."""
+        Precondition: client is connected to a socket."""
+        try:
+            return self.client.recv(2048).decode()
+        except:
+            self.close()
 
-        if not addr in self.address_list:
-            self.address_list.append(str(addr))
-            self.received_memory += str(addr) + ":-1;"
-
-    def add_address_range(self, start, end):
-        """Precondition: `start` <= `end`.
-
-        Adds a range of addresses from `start` to `end`, both inclusive.
-
-        `start` is a hexidecimal value representing the first address in the range.
-
-        `end` is a hexidecimal value representing the last address in the range."""
-
-        for addr in range(int(start), int(end) + 1):
-            self.add_address(addr)
-
-    def get_memory(self) -> list:
-        """Gets the latest memory data received from the external tool. 
-        
-        This will return a list of the latest values received from each address paired 
-        with the address it was read from, represented as:
-
-        `"addr:-"`, if there has been no data received yet from an address
-
-        `"addr:data"`, with both `addr` and `data` in decimal form."""
-
-        self.memory_request = "MEMORY;" + ";".join(self.address_list) + "\n"
-        self.address_list = []
-
-        return self.received_memory.split(";")
-
-    def set_controller_input(self, a=False, b=False, up=False, down=False, right=False, left=False):
-        """Sets the controller inputs to be executed in the emulator.
-        All inputs are set to `False` be default.
-        The inputs are executed until a new controller input is sent.
-
-        `a` is the state of the A button
-
-        `b` is the state of the B button
-
-        `up` is the state of the Up button on the control pad
-
-        `down` is the state of the Down button on the control pad
-
-        `right` is the state of the Right button on the control pad
-
-        `left` is the state of the Left button on the control pad"""
-
-        bool_to_string = {False : "false", True : "true"}
-        controller_input = bool_to_string[a] + ";" + bool_to_string[b] + ";" + \
-                           bool_to_string[up] + ";" + bool_to_string[down] + ";" + \
-                           bool_to_string[right] + ";" + bool_to_string[left]
-        self.input_request = "INPUT;" + controller_input + "\n"
+        return "";
