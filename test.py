@@ -16,17 +16,15 @@ if __name__ == "__main__":
     external_tool = bird.ExternalTool()
     bizhawk_objects = [memory, controller_input, emulation, external_tool]
 
-    # Add some arbitrary addresses to read from.
-    # All addresses must be added before calling birdseye.Client.connect().
-    memory.add_address(0x00EE)
-    memory.add_address(0x002D)
-    memory.add_address_range(0x0200, 0x020A)
-
     client.connect()
     print("Conencting to server at {} on port {}.".format(HOST, PORT))
 
-    close_attempt = False
+    # Add some arbitrary addresses to read from.
+    memory.add_address(0x0002)
+    memory.add_address(0x0032)
+    memory.add_address_range(0x0150, 0x015A)
 
+    close_attempt = False
     if not client.is_connected():
             print("Could not connect to external tool :[")
             close_attempt = True

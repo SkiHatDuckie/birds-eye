@@ -25,6 +25,7 @@ namespace BirdsEye {
         private Emulation _emulation;
 
         private bool _commandeer = false;
+
         private Thread _commThread;
 
         private MenuStrip _mainFormMenu;
@@ -48,7 +49,7 @@ namespace BirdsEye {
             _input = new ControllerInput(_log);
             _emulation = new Emulation(_log);
 
-            _log.Write(1, "Initializing main form.");
+            _log.Write(0, "Initializing main form.");
             this.FormClosing += OnFormClosing;
 
             _commThread = new Thread(new ParameterizedThreadStart(_server.AcceptConnections));
