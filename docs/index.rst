@@ -8,9 +8,13 @@ Welcome to birds-eye's documentation!
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: Python API:
 
-
+   source/api/controllerInput
+   source/api/emulation
+   source/api/externalTool
+   source/api/memory
+   source/api/socketClient
 
 Indices and tables
 ==================
