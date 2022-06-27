@@ -35,7 +35,8 @@ If everything is correct, then you should be able to open up the external tool b
 Tools -> External Tools -> BirdsEye
 
 ### Installing the library
-`pip install birds-eye-lib`
+`pip install birds-eye-lib`<br/>
+[python library docs](https://birds-eye.readthedocs.io/en/latest/)
 
 ## Communication Modes
 Determines how the external tool communicates with the emulator and a connected python client.
