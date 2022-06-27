@@ -8,8 +8,9 @@ class Memory:
     def add_address(self, addr):
         """Adds an address for the external tool to return.
         
-        `addr` is a hexidecimal value representing the address to read from 
-        in the BizHawk emulator's memory."""
+        :param addr: A hexidecimal value representing the address to read from \
+        in the BizHawk emulator's memory.
+        :type addr: int"""
         if not addr in self.address_list:
             self.address_list.append(str(addr))
             self.received_memory += str(addr) + ":-1;"
@@ -17,11 +18,13 @@ class Memory:
     def add_address_range(self, start, end):
         """Adds a range of addresses from `start` to `end`, both inclusive.
 
-        `start` is a hexidecimal value representing the first address in the range.
+        :param start: A hexidecimal value representing the first address in the range.
+        :type start: int
 
-        `end` is a hexidecimal value representing the last address in the range.
+        :param end: A hexidecimal value representing the last address in the range.
+        :type end: int
         
-        Precondition: `start` <= `end`."""
+        :precondition: `start` <= `end`."""
         for addr in range(int(start), int(end) + 1):
             self.add_address(addr)
     
@@ -40,9 +43,12 @@ class Memory:
 
         `"addr:data"`, with both `addr` and `data` in decimal form."""
         return self.received_memory.split(";")
-    
+
     def process_responses(self, responses):
-        """Updates fields accordingly with the given responses."""
+        """Updates fields accordingly with the given responses.
+
+        :param responses: A message received from the external tool.
+        :type responses: str"""
         for response in responses.split("\n"):
             if len(response) > 6 and response[0:6] == "MEMORY":
                     self.received_memory = response[7:]

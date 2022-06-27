@@ -8,6 +8,7 @@ This library is VERY bares bones at the moment, with only the current features a
 - Connecting to the external tool <br/>
 - Retrieving memory data from the external tool <br/>
 - Sending inputs to be executed in the emulator <br/>
+- Retrieving the current framecount <br/>
 
 I plan on adding a lot more as I continue to use this library myself. <br/>
 

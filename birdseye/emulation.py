@@ -9,7 +9,10 @@ class Emulation:
         self.request = "FRAME;\n"
 
     def process_responses(self, responses):
-        """Updates fields accordingly with the given responses."""
+        """Updates class fields accordingly with the given responses.
+        
+        :param responses: A message received from the external tool.
+        :type responses: str"""
         for response in responses.split("\n"):
             if len(response) > 5 and response[0:5] == "FRAME":
                     self.framecount = int(response[6:])
