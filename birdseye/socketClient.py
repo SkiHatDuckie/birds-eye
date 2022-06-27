@@ -8,9 +8,11 @@ class Client:
     Use the external tool to get and set the port and
     address the server should listen in to.
 
-    `ip` is the socket address
+    :param ip: The socket address.
+    :type ip: str
 
-    `port` is the socket port number"""
+    :param port: The socket port number.
+    :type port: int"""
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
@@ -39,10 +41,14 @@ class Client:
         """Returns true if client is connected to the external tool."""
         return self.connection_status == 0
     
-    def send_requests(self, objects: list):
+    def send_requests(self, objects):
         """Send requests from any birdseye object to the external tool.
+
+        :param objects: A list of birdseye classes that interact with the external tool or \
+        BizHawk emulator.
+        :type objects: list
         
-        Precondition: client is connected to a socket."""
+        :precondition: client is connected to a socket."""
         try:
             self.client.sendall(("".join([obj.request for obj in objects])).encode())
         except:
@@ -51,7 +57,7 @@ class Client:
     def get_responses(self) -> str:
         """Receive data collected by the external tool, and update each object in `objects` accordingly.
         
-        Precondition: client is connected to a socket."""
+        :precondition: client is connected to a socket."""
         try:
             return self.client.recv(2048).decode()
         except:
