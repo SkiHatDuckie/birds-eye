@@ -16,7 +16,7 @@ setup(
     description="A BizHawk external tool + python library for python scripts to communicate with the BizHawk emulator.",
     long_description=long_description,
     long_description_content_type="text/markdown",
-    url="https://birds-eye-lib.readthedocs.io/",
+    url="https://birds-eye.readthedocs.io/",
     author="SkiHatDuckie",
     author_email="SkiHatDuckie@gmail.com",
     license="MIT",
