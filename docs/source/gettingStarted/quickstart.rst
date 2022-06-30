@@ -1,2 +1,3 @@
-birds-eye Speedrun (Any%)
-=========================
+Quickstart
+==========
+

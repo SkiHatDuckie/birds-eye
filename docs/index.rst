@@ -10,6 +10,11 @@ Welcome to the birds-eye documentation!
    :maxdepth: 2
    :caption: Getting Started:
 
+   source/gettingStarted/intro
+   source/gettingStarted/installation
+   source/gettingStarted/externalTool
+   source/gettingStarted/quickstart
+
 .. toctree::
    :maxdepth: 2
    :caption: Python API:
