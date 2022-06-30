@@ -11,7 +11,7 @@ class Memory:
         :param addr: A hexidecimal value representing the address to read from \
         in the BizHawk emulator's memory.
         :type addr: int"""
-        if not addr in self.address_list:
+        if not str(addr) in self.address_list:
             self.address_list.append(str(addr))
             self.received_memory += str(addr) + ":-1;"
 
