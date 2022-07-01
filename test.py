@@ -1,11 +1,8 @@
 import birdseye as bird
 import time
 
-# External tool connects to this address and port 
-# TODO: Add way in external tool to set port and address
 HOST = "127.0.0.1"
-PORT = 8081
-
+PORT = 8080
 
 if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
@@ -20,9 +17,8 @@ if __name__ == "__main__":
     print("Conencting to server at {} on port {}.".format(HOST, PORT))
 
     # Add some arbitrary addresses to read from.
-    memory.add_address(0x0002)
-    memory.add_address(0x0032)
-    memory.add_address_range(0x0150, 0x015A)
+    memory.add_address(0x0057)
+    memory.add_address_range(0x0087, 0x008B)
 
     close_attempt = False
     if not client.is_connected():
@@ -43,8 +39,8 @@ if __name__ == "__main__":
             memory.request_memory()
             controller_input.set_controller_input(right=True)
             emulation.request_framecount()
-            if cnt == 0:
-                external_tool.set_commandeer(True)
+            # if cnt == 0:
+            #     external_tool.set_commandeer(True)
             client.send_requests(bizhawk_objects)
 
             # Processing responses from external tool.

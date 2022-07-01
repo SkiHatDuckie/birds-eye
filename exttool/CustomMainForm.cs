@@ -146,6 +146,7 @@ namespace BirdsEye {
                     if (msg != "MEMORY;") {
                         _memory.AddAddressesFromString(msg);
                     }
+                    _memory.ReadMemory(APIs);
                     response += "MEMORY;" + _memory.FormatMemory() + "\n";
                 } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("INPUT")) {
                     _input.SetInputFromString(msg);
