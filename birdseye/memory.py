@@ -7,7 +7,7 @@ class Memory:
 
     def add_address(self, addr):
         """Adds an address for the external tool to return.
-        
+
         :param addr: A hexidecimal value representing the address to read from \
         in the BizHawk emulator's memory.
         :type addr: int"""
@@ -23,11 +23,11 @@ class Memory:
 
         :param end: A hexidecimal value representing the last address in the range.
         :type end: int
-        
+
         :precondition: `start` <= `end`."""
         for addr in range(int(start), int(end) + 1):
             self.add_address(addr)
-    
+
     def request_memory(self):
         """Requests for the latest memory data from the external tool."""
         self.request = "MEMORY;" + ";".join(self.address_list) + "\n"
@@ -35,7 +35,7 @@ class Memory:
 
     def get_memory(self) -> list:
         """Gets the latest memory data received from the external tool. 
-        
+
         This will return a list of the latest values received from each address paired 
         with the address it was read from, represented as:
 

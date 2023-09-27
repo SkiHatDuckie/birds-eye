@@ -23,10 +23,10 @@ class Client:
 
     def connect(self):
         """Attempt to connect to the external tool.
-        
+
         Call `Client.is_connected()` to see if the attempt was successful."""
         self.connection_status = self.client.connect_ex((self.ip, self.port))
-    
+
     def close(self):
         """Close socket connection with external tool and send a final message
         notifying the external tool before closing."""
@@ -40,27 +40,27 @@ class Client:
     def is_connected(self):
         """Returns true if client is connected to the external tool."""
         return self.connection_status == 0
-    
+
     def send_requests(self, objects):
         """Send requests from any birdseye object to the external tool.
 
         :param objects: A list of birdseye classes that interact with the external tool or \
         BizHawk emulator.
         :type objects: list
-        
+
         :precondition: client is connected to a socket."""
         try:
             self.client.sendall(("".join([obj.request for obj in objects])).encode())
         except:
             self.close()
-    
+
     def get_responses(self) -> str:
         """Receive data collected by the external tool, and update each object in `objects` accordingly.
-        
+
         :precondition: client is connected to a socket."""
         try:
             return self.client.recv(2048).decode()
         except:
             self.close()
 
-        return "";
+        return ""
