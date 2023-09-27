@@ -1,14 +1,15 @@
 # birds-eye
-A BizHawk external tool + python library, giving a (hopefully) convenient interface for python scripts to communicate with the BizHawk emulator. <br/>
+A BizHawk external tool + python library, giving a (hopefully) convenient interface for python scripts to communicate with the BizHawk emulator.
 
-This is the first project I've made with the intent of others using it, so any kind of suggestion would be incredibly helpful. <br/>
+This is the first project I've made with the intent of others using it, so any kind of suggestion would be incredibly helpful.
+
 Thank you :]
 
-This library is VERY bares bones at the moment, with only the current features available: <br/>
-- Connecting to the external tool <br/>
-- Retrieving memory data from the external tool <br/>
-- Sending inputs to be executed in the emulator <br/>
-- Retrieving the current framecount <br/>
+This library is VERY bares bones at the moment, with only the current features available:
+- Connecting to the external tool
+- Retrieving memory data from the external tool
+- Sending controller inputs to be executed in the emulator
+- Retrieving the current framecount
 
 I plan on adding a lot more as I continue to use this library myself. <br/>
 
@@ -25,8 +26,8 @@ It should look like this afterwords:
 ```
 BizHawk
 +--ExternalTools
-|   +--BirdsEye.dll
-|   +--...
+|  +--BirdsEye.dll
+|  +--...
 +--EmuHawk.exe
 +--...
 ```
@@ -49,7 +50,3 @@ play, such as reading from memory, will still be functional.
 ### Commandeer
 This mode will allow a connected python client to begin interacting with the emulator by sending and receiving
 messages to and from the external tool.
-
-## Updates
-I will now be creating a list of features that I plan on adding or deleting or fixing as an issue ticket to make 
-it easier for both myself and others to see what needs to be done for the next update.
