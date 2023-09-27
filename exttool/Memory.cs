@@ -5,9 +5,9 @@ using BizHawk.Client.Common;
 
 namespace BirdsEye {
     public class Memory {
-        private List<long> _addressList = new List<long>();
-        private List<int> _memoryList = new List<int>();
-        private Logging _log;
+        private readonly List<long> _addressList = new();
+        private readonly List<int> _memoryList = new();
+        private readonly Logging _log;
 
         public Memory(Logging log) {
             _log = log;

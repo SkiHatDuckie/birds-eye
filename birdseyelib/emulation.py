@@ -10,7 +10,7 @@ class Emulation:
 
     def process_responses(self, responses):
         """Updates class fields accordingly with the given responses.
-        
+
         :param responses: A message received from the external tool.
         :type responses: str"""
         for response in responses.split("\n"):

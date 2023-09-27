@@ -2,7 +2,7 @@ Quickstart
 ==========
 Here is a basic example of a working birds-eye python script::
 
-    import birdseye as bird
+    import birdseyelib as bird
 
     HOST = "127.0.0.1"
     PORT = 8080

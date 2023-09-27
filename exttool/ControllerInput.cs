@@ -5,8 +5,8 @@ using BizHawk.Client.Common;
 
 namespace BirdsEye {
     public class ControllerInput {
-        private bool[] _inputState = {false, false, false, false, false, false};
-        private Logging _log;
+        private readonly bool[] _inputState = {false, false, false, false, false, false};
+        private readonly Logging _log;
 
         public ControllerInput(Logging log) {
             _log = log;
@@ -31,7 +31,8 @@ namespace BirdsEye {
         /// to be executed when `ExecuteInput` is called.
         ///</summary>
         public void SetInputFromString(string str) {
-            string[] newState = str.Substring(6).Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+            string[] newState = str.Substring(6)
+                                   .Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
             for (int i = 0; i < 6; i++) {
                 _inputState[i] = Convert.ToBoolean(newState[i]);
             }

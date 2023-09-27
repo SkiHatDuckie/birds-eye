@@ -2,7 +2,7 @@ using BizHawk.Client.Common;
 
 namespace BirdsEye {
     public class Emulation {
-        private Logging _log;
+        private readonly Logging _log;
 
         public Emulation(Logging log) {
             _log = log;

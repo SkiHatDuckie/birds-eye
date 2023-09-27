@@ -1,7 +1,7 @@
 emulation
 =========
 
-.. currentmodule:: birdseye.emulation
+.. currentmodule:: birdseyelib.emulation
 
-.. autoclass:: birdseye.Emulation
+.. autoclass:: birdseyelib.Emulation
     :members:
