@@ -134,37 +134,36 @@ namespace BirdsEye {
         /// if the python client sends a request for the connection to be closed.
         /// </summary>
         private void ProcessRequests() {
-            string[] msgs = _server.GetRequests();
-            if (msgs[0] == "ERR") {
-                _log.Write(2, "Disconnecting from python client due to bad request.");
-                HandleDisconnect();
-            }
-
-            string response = "";
-            foreach (string msg in msgs) {
-                if (msg.Length > 6 && msg.Substring(0, 6).Equals("MEMORY")) {
-                    if (msg != "MEMORY;") {
-                        _memory.AddAddressesFromString(msg);
-                    }
-                    _memory.ReadMemory(APIs);
-                    response += "MEMORY;" + _memory.FormatMemory() + "\n";
-                } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("INPUT")) {
-                    _input.SetInputFromString(msg);
-                    response += "INPUT;\n";
-                } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("CLOSE")) {
-                    HandleDisconnect();
-                } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("FRAME")) {
-                   response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
-                } else if (msg.Length > 10 && msg.Substring(0, 10).Equals("COMMANDEER")) {
-                    if (msg.Substring(11, 4) == "True") {
-                        EnableCommandeer();
-                    } else {
-                        DisableCommandeer();
+            try {
+                string response = "";
+                foreach (string msg in _server.GetRequests()) {
+                    if (msg.Length > 6 && msg.Substring(0, 6).Equals("MEMORY")) {
+                        if (msg != "MEMORY;") {
+                            _memory.AddAddressesFromString(msg);
+                        }
+                        _memory.ReadMemory(APIs);
+                        response += "MEMORY;" + _memory.FormatMemory() + "\n";
+                    } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("INPUT")) {
+                        _input.SetInputFromString(msg);
+                        response += "INPUT;\n";
+                    } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("CLOSE")) {
+                        HandleDisconnect();
+                    } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("FRAME")) {
+                    response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
+                    } else if (msg.Length > 10 && msg.Substring(0, 10).Equals("COMMANDEER")) {
+                        if (msg.Substring(11, 4) == "True") {
+                            EnableCommandeer();
+                        } else {
+                            DisableCommandeer();
+                        }
                     }
                 }
+                _server.SendMessage(response);
+            } catch {
+                _log.Write(3, "An unexpected exception occured when trying to read requests.");
+                _log.Write(2, "Disconnecting from python client due to exception.");
+                HandleDisconnect();
             }
-
-            _server.SendMessage(response);
         }
 
         /// <summary>
