@@ -14,27 +14,27 @@ namespace BirdsEye {
 		/// <see cref="ApiContainer"/> can be used as a shorthand for accessing 
         /// the various APIs, more like the Lua syntax.
 		/// </remarks>
-		public ApiContainer? _apiContainer { get; set; }
-		private ApiContainer APIs => _apiContainer ?? throw new NullReferenceException();
+		public ApiContainer? APIContainer { get; set; }
+		private ApiContainer APIs => APIContainer ?? throw new NullReferenceException();
 
-        private Config _config = new Config();
-        private Logging _log;
-        private SocketServer _server;
-        private Memory _memory;
-        private ControllerInput _input;
-        private Emulation _emulation;
+        private readonly Config _config = new();
+        private readonly Logging _log;
+        private readonly SocketServer _server;
+        private readonly Memory _memory;
+        private readonly ControllerInput _input;
+        private readonly Emulation _emulation;
 
         private bool _commandeer = false;
 
         private Thread _commThread;
 
-        private MenuStrip _mainFormMenu;
-        private ToolStripMenuItem _optionSubMenu;
-        private Label _lblRomName;
-        private Label _lblCommMode;
-        private Button _btnChangeCommMode;
-        private Label _lblConnectionStatus;
-        private ListBox _lstError;
+        private readonly MenuStrip _mainFormMenu;
+        private readonly ToolStripMenuItem _optionSubMenu;
+        private readonly Label _lblRomName;
+        private readonly Label _lblCommMode;
+        private readonly Button _btnChangeCommMode;
+        private readonly Label _lblConnectionStatus;
+        private readonly ListBox _lstError;
 
         protected override string WindowTitleStatic => "BirdsEye";
 
@@ -50,7 +50,7 @@ namespace BirdsEye {
             _emulation = new Emulation(_log);
 
             _log.Write(0, "Initializing main form.");
-            this.FormClosing += OnFormClosing;
+            FormClosing += OnFormClosing;
 
             _commThread = new Thread(new ParameterizedThreadStart(_server.AcceptConnections));
             _commThread.Start(_config);
@@ -84,12 +84,12 @@ namespace BirdsEye {
                 ForeColor = Color.Red
             };
             _optionSubMenu = new ToolStripMenuItem {
-                Size = new System.Drawing.Size(50, 25),
+                Size = new Size(50, 25),
                 Text = "&Options"
             };
             _mainFormMenu = new MenuStrip {
                 Location = new Point(0, 0),
-                Size = new System.Drawing.Size(this.Width, 25),
+                Size = new Size(Width, 25),
                 TabIndex = 0,
                 Text = "menuStrip1",
             };
@@ -103,8 +103,8 @@ namespace BirdsEye {
             Controls.Add(_lstError);
             ResumeLayout();
 
-            _optionSubMenu.Click += optionSubMenuOnClick;
-            _btnChangeCommMode.Click += btnChangeCommModeOnClick;
+            _optionSubMenu.Click += SubMenuOptionOnClick;
+            _btnChangeCommMode.Click += ChangeCommModeButtonOnClick;
         }
 
         /// <summary>
@@ -264,7 +264,7 @@ namespace BirdsEye {
         /// Displays an error if the user attempts to switch to commandeer mode before a
         /// python client is connected, or if a ROM is not loaded yet.
         /// </summary>
-        private void btnChangeCommModeOnClick(object sender, EventArgs e) {
+        private void ChangeCommModeButtonOnClick(object sender, EventArgs e) {
             if (CanCommandeer()) {
                 if (!_commandeer) {
                     EnableCommandeer();
@@ -277,8 +277,8 @@ namespace BirdsEye {
         /// <summary>
         /// Opens an instance of the options form.
         /// </summary>
-        private void optionSubMenuOnClick(object sender, EventArgs e) {
-            OptionsForm options = new OptionsForm(_config);
+        private void SubMenuOptionOnClick(object sender, EventArgs e) {
+            OptionsForm options = new(_config);
             options.ShowDialog();
         }
 

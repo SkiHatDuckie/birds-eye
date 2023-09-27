@@ -4,26 +4,26 @@ using System.Windows.Forms;
 
 namespace BirdsEye {
     public class OptionsForm : Form {
-        private Config _config;
+        private readonly Config _config;
 
-        private Label _lblHost;
-        private Label _lblPort;
-        private TextBox _txtHost;
-        private TextBox _txtPort;
-        private GroupBox _grpSocketAddress;
+        private readonly Label _lblHost;
+        private readonly Label _lblPort;
+        private readonly TextBox _txtHost;
+        private readonly TextBox _txtPort;
+        private readonly GroupBox _grpSocketAddress;
 
-        private Label _lblLogLevel;
-        private TextBox _txtLogLevel;
-        private Label _lblLogLevelRange;
-        private GroupBox _grpLogging;
+        private readonly Label _lblLogLevel;
+        private readonly TextBox _txtLogLevel;
+        private readonly Label _lblLogLevelRange;
+        private readonly GroupBox _grpLogging;
 
-        private Label _lblTimeout;
-        private TextBox _txtTimeout;
-        private GroupBox _grpSocket;
+        private readonly Label _lblTimeout;
+        private readonly TextBox _txtTimeout;
+        private readonly GroupBox _grpSocket;
 
-        private Label _lblSubmit;
-        private Button _btnSubmit;
-        private Label _lblError;
+        private readonly Label _lblSubmit;
+        private readonly Button _btnSubmit;
+        private readonly Label _lblError;
 
         public OptionsForm(Config config) {
             _config = config;
@@ -105,7 +105,7 @@ namespace BirdsEye {
             _lblError = new Label {
                 Text = "Close and reopen BirdsEye after submit for changes to take effect.",
                 ForeColor = Color.Red,
-                Location = new Point(0, this.Height - 72),
+                Location = new Point(0, Height - 72),
                 AutoSize = true
             };
 
@@ -129,13 +129,13 @@ namespace BirdsEye {
             Controls.Add(_lblError);
             ResumeLayout();
 
-            _btnSubmit.Click += btnSubmitOnClick;
+            _btnSubmit.Click += SubmitButtonOnClick;
         }
 
         /// <summary>
         /// Updates birdconfig.txt with the inputted values of each option.
         /// </summary>
-        private void btnSubmitOnClick(object sender, EventArgs e) {
+        private void SubmitButtonOnClick(object sender, EventArgs e) {
             _config.host = _txtHost.Text;
             _config.port = Convert.ToInt32(_txtPort.Text);
             _config.logLevel = Convert.ToInt32(_txtLogLevel.Text);

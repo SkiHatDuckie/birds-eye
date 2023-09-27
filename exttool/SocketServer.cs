@@ -5,12 +5,12 @@ using System.Text;
 
 namespace BirdsEye {
     public class SocketServer {
-        private TcpListener _server;
+        private readonly TcpListener _server;
         private TcpClient? _client;
         private NetworkStream? _clientStream;
-        private int _port;
-        private IPAddress _host;
-        private Logging _log;
+        private readonly int _port;
+        private readonly IPAddress _host;
+        private readonly Logging _log;
 
         /// <summary>
         /// Create a socket server object that listens for 
@@ -40,7 +40,7 @@ namespace BirdsEye {
         /// Returns true if a python client is connected to the server.
         /// </summary>
         public bool IsConnected() {
-            return (_client == null) ? false : true;
+            return _client != null;
         }
 
         /// <summary>
@@ -49,7 +49,7 @@ namespace BirdsEye {
         /// Precondition: Python client is connected to server.
         /// </summary>
         public string[] GetRequests() {
-            Byte[] bytes = new Byte[2048];
+            byte[] bytes = new byte[2048];
             int numBytes = _clientStream!.Read(bytes, 0, bytes.Length);
             _log.Write(0, $"Received the following message: {Encoding.ASCII.GetString(bytes, 0, numBytes)}");
 

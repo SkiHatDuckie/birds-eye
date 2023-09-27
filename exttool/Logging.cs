@@ -16,13 +16,13 @@ namespace BirdsEye {
         /// error (3) - Unhandled exceptions.<br/>
         /// crash (4) - Information given out if the external tool crashes.<br/>
         /// </remarks>
-        private static Dictionary<int, string> LEVELS = new Dictionary<int, string>() {
+        private readonly static Dictionary<int, string> LEVELS = new() {
             {0, "debug"}, {1, "info"}, {2, "warning"}, {3, "error"}, {4, "crash"}
         };
         /// <summary>
         /// The minimum log level to write messages to output for.
         /// </summary>
-        private int _minLevel = 1;
+        private readonly int _minLevel = 1;
 
         public Logging(int minLevel) {
             _minLevel = minLevel;
