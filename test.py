@@ -1,4 +1,4 @@
-import birdseye as bird
+import birdseyelib as bird
 import time
 
 HOST = "127.0.0.1"

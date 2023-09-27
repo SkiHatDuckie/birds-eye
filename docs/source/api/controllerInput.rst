@@ -1,7 +1,7 @@
 controllerInput
 ===============
 
-.. currentmodule:: birdseye.controllerInput
+.. currentmodule:: birdseyelib.controllerInput
 
-.. autoclass:: birdseye.ControllerInput
+.. autoclass:: birdseyelib.ControllerInput
     :members:

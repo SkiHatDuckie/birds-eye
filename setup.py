@@ -12,7 +12,7 @@ with open(path.join(HERE, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name="birds-eye-lib",
-    version="0.3.1",
+    version="0.3.2",
     description="A BizHawk external tool + python library for python scripts to communicate with the BizHawk emulator.",
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -29,8 +29,9 @@ setup(
         "Programming Language :: Python :: 3.7",
         "Programming Language :: Python :: 3.8",
         "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3.10",
         "Operating System :: OS Independent"
     ],
-    packages=["birdseye"],
+    packages=["birdseyelib"],
     include_package_data=True,
 )

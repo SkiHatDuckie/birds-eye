@@ -1,7 +1,7 @@
 socketClient
 ============
 
-.. currentmodule:: birdseye.socketClient
+.. currentmodule:: birdseyelib.socketClient
 
-.. autoclass:: birdseye.Client
+.. autoclass:: birdseyelib.Client
     :members:

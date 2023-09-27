@@ -1,7 +1,7 @@
 externalTool
 ============
 
-.. currentmodule:: birdseye.externalTool
+.. currentmodule:: birdseyelib.externalTool
 
-.. autoclass:: birdseye.ExternalTool
+.. autoclass:: birdseyelib.ExternalTool
     :members:

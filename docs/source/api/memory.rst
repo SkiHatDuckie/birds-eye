@@ -1,7 +1,7 @@
 memory
 ======
 
-.. currentmodule:: birdseye.memory
+.. currentmodule:: birdseyelib.memory
 
-.. autoclass:: birdseye.Memory
+.. autoclass:: birdseyelib.Memory
     :members:

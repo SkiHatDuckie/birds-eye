@@ -22,8 +22,8 @@ It should look like this afterwords::
 
     | BizHawk
     | +--ExternalTools
-    |   +--BirdsEye.dll
-    |   +--...
+    |    +--BirdsEye.dll
+    |    +--...
     | +--EmuHawk.exe
     | +--...
 
