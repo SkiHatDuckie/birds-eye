@@ -11,7 +11,7 @@ This library is VERY bares bones at the moment, with only the current features a
 - Sending controller inputs to be executed in the emulator
 - Retrieving the current framecount
 
-I plan on adding a lot more as I continue to use this library myself. <br/>
+I plan on adding a lot more as I continue to use this library myself.
 
 Tested using BizHawk version 2.6.2, however other versions *might* work.
 
@@ -20,7 +20,7 @@ Tested using BizHawk version 2.6.2, however other versions *might* work.
 ### External Tool
 The external tool can be found and downloaded in the [birds-eye github repository](https://github.com/SkiHatDuckie/birds-eye). (check releases)
 
-Move BirdsEye.dll to the ExternalTools directory in your BizHawk folder. <br/>
+Move BirdsEye.dll to the ExternalTools directory in your BizHawk folder.<br/>
 It should look like this afterwords:
 
 ```
@@ -32,8 +32,8 @@ BizHawk
 +--...
 ```
 
-If everything is correct, then you should be able to open up the external tool by running the emulator, then going to <br/>
-Tools -> External Tools -> BirdsEye
+If everything is correct, then you should be able to open up the external tool by running the emulator, then going to:<br/>
+*Tools* -> *External Tools* -> *BirdsEye*
 
 ### Installing the library
 `pip install birds-eye-lib`<br/>
