@@ -22,8 +22,8 @@ if __name__ == "__main__":
 
     close_attempt = False
     if not client.is_connected():
-            print("Could not connect to external tool :[")
-            close_attempt = True
+        print("Could not connect to external tool :[")
+        close_attempt = True
 
     while not close_attempt:
         cnt = 0

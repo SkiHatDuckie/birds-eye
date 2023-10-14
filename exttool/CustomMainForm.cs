@@ -136,22 +136,22 @@ namespace BirdsEye {
         private void ProcessRequests() {
             try {
                 string response = "";
-                foreach (string msg in _server.GetRequests()) {
-                    if (msg.Length > 6 && msg.Substring(0, 6).Equals("MEMORY")) {
-                        if (msg != "MEMORY;") {
-                            _memory.AddAddressesFromString(msg);
+                foreach (Request req in _server.ParseRequests()) {
+                    if (req.Tag == "MEMORY") {
+                        if (!string.IsNullOrEmpty(req.Data)) {
+                            _memory.AddAddressesFromString(req.Data);
                         }
                         _memory.ReadMemory(APIs);
                         response += "MEMORY;" + _memory.FormatMemory() + "\n";
-                    } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("INPUT")) {
-                        _input.SetInputFromString(msg);
+                    } else if (req.Tag == "INPUT") {
+                        _input.SetInputFromString(req.Data);
                         response += "INPUT;\n";
-                    } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("CLOSE")) {
+                    } else if (req.Tag == "CLOSE") {
                         HandleDisconnect();
-                    } else if (msg.Length > 5 && msg.Substring(0, 5).Equals("FRAME")) {
-                    response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
-                    } else if (msg.Length > 10 && msg.Substring(0, 10).Equals("COMMANDEER")) {
-                        if (msg.Substring(11, 4) == "True") {
+                    } else if (req.Tag == "FRAME") {
+                        response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
+                    } else if (req.Tag == "COMMANDEER") {
+                        if (req.Data == "True") {
                             EnableCommandeer();
                         } else {
                             DisableCommandeer();
