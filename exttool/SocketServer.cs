@@ -43,7 +43,10 @@ namespace BirdsEye {
             return _client != null;
         }
 
-        /// <summary></summary>
+        /// <summary>
+        /// Blocks until a message is received from the python client.
+        /// Returns the received data as bytes.
+        /// </summary>
         private (int, byte[]) ReceiveMessages() {
             byte[] bytes = new byte[2048];
             int numBytes = _clientStream!.Read(bytes, 0, bytes.Length);

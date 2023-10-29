@@ -7,11 +7,10 @@ PORT = 8080
 if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
 
-    memory = bird.Memory()
-    controller_input = bird.ControllerInput()
-    emulation = bird.Emulation()
-    external_tool = bird.ExternalTool()
-    bizhawk_objects = [memory, controller_input, emulation, external_tool]
+    memory = bird.Memory(client)
+    controller_input = bird.ControllerInput(client)
+    emulation = bird.Emulation(client)
+    external_tool = bird.ExternalTool(client)
 
     client.connect()
     print("Conencting to server at {} on port {}.".format(HOST, PORT))
@@ -35,21 +34,19 @@ if __name__ == "__main__":
             client.connect()
 
         while client.is_connected():
-            # Sending requests to the external tool.
+            # Queueing requests to the external tool.
             memory.request_memory()
             controller_input.set_controller_input(right=True)
             emulation.request_framecount()
             # if cnt == 0:
             #     external_tool.set_commandeer(True)
-            client.send_requests(bizhawk_objects)
 
-            # Processing responses from external tool.
-            responses = client.get_responses()
-            memory.process_responses(responses)
-            emulation.process_responses(responses)
+            # Send requests, parse responses, and advance the emulator to the next frame.
+            client.advance_frame()
 
-            print("Frame:" + str(emulation.framecount) + ": " \
-                  + " ".join([data for data in memory.get_memory()])
+            print(
+                "Frame:" + str(emulation.get_framecount()) + ": " \
+                + " ".join([data for data in memory.get_memory()])
             )
 
             cnt += 1

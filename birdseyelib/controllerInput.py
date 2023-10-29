@@ -1,7 +1,7 @@
 class ControllerInput:
     """Class containing various functions for reading memory from BizHawk."""
-    def __init__(self) -> None:
-        self.request = ""
+    def __init__(self, client) -> None:
+        self.client = client
 
     def set_controller_input(self, a=False, b=False, up=False, down=False, right=False, left=False):
         """Sets the controller inputs to be executed in the emulator.
@@ -29,4 +29,4 @@ class ControllerInput:
         controller_input = bool_to_string[a] + ";" + bool_to_string[b] + ";" + \
                            bool_to_string[up] + ";" + bool_to_string[down] + ";" + \
                            bool_to_string[right] + ";" + bool_to_string[left]
-        self.request = "INPUT;" + controller_input + "\n"
+        self.client._queue_request("INPUT;" + controller_input + "\n")

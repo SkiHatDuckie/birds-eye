@@ -1,8 +1,8 @@
 class Memory:
     """Class containing various functions for setting controller input in BizHawk."""
-    def __init__(self) -> None:
+    def __init__(self, client) -> None:
+        self.client = client
         self.address_list = []
-        self.request = ""
         self.received_memory = ""
 
     def add_address(self, addr):
@@ -30,7 +30,7 @@ class Memory:
 
     def request_memory(self):
         """Requests for the latest memory data from the external tool."""
-        self.request = "MEMORY;" + ";".join(self.address_list) + "\n"
+        self.client._queue_request("MEMORY;" + ";".join(self.address_list) + "\n")
         self.address_list = []
 
     def get_memory(self) -> list:
@@ -42,13 +42,7 @@ class Memory:
         `"addr:-1"`, if there has been no data received yet from an address
 
         `"addr:data"`, with both `addr` and `data` in decimal form."""
+        data = self.client._get_latest_response_data("MEMORY")
+        if data:
+            self.received_memory = data
         return self.received_memory.split(";")
-
-    def process_responses(self, responses):
-        """Updates fields accordingly with the given responses.
-
-        :param responses: A message received from the external tool.
-        :type responses: str"""
-        for response in responses.split("\n"):
-            if len(response) > 6 and response[0:6] == "MEMORY":
-                    self.received_memory = response[7:]
