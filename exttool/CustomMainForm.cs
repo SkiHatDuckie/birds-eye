@@ -49,12 +49,11 @@ namespace BirdsEye {
             _input = new ControllerInput(_log);
             _emulation = new Emulation(_log);
 
-            _log.Write(0, "Initializing main form.");
-            FormClosing += OnFormClosing;
-
             _commThread = new Thread(new ParameterizedThreadStart(_server.AcceptConnections));
             _commThread.Start(_config);
 
+            _log.Write(0, "Initializing main form.");
+            FormClosing += OnFormClosing;
             ClientSize = new Size(480, 320);
             SuspendLayout();
 
@@ -119,11 +118,17 @@ namespace BirdsEye {
         /// Executed before every frame.
         /// </summary>
         protected override void UpdateBefore() {
-            UpdateConnectionStatus();
-            if (_server.IsConnected() && APIs.GameInfo.GetRomName() != "Null") {
-                ProcessRequests();
-                if (_commandeer) {
-                    _input.ExecuteInput(APIs);
+            bool isConnected = _server.IsConnected();
+            UpdateConnectionStatus(isConnected);
+            if (isConnected) {
+                if (!_commThread.IsAlive) {
+                    _commThread.Join();
+                }
+                if (APIs.GameInfo.GetRomName() != "Null") {
+                    ProcessRequests();
+                    if (_commandeer) {
+                        _input.ExecuteInput(APIs);
+                    }
                 }
             }
         }
@@ -178,30 +183,13 @@ namespace BirdsEye {
         }
 
         /// <summary>
-        /// Determine if all characters in `str` are valid hexadecimal digits.<br/>
-        /// Returns false if an invalid digit is found, otherwise this returns true.
-        /// </summary>
-        private bool IsHexadecimal(string str) {
-            string hexadecimalChars = "0987654321ABCDEFabcdef";
-            foreach (char ch in str) {
-                if (!hexadecimalChars.Contains(ch)) {
-                    return false;
-                }
-            }
-            return true;
-        }
-
-        /// <summary>
         /// Update the current status of the socket connection and update
         /// `_lblConnectionStatus` accordingly.
         /// </summary>
-        private void UpdateConnectionStatus() {
-            if (_server.IsConnected()) {
+        private void UpdateConnectionStatus(bool isConnected) {
+            if (isConnected) {
                 _lblConnectionStatus.Text = "Script found";
                 _lblConnectionStatus.ForeColor = Color.Blue;
-                if (!_commThread.IsAlive) {
-                    _commThread.Join();
-                }
             } else {
                 _lblConnectionStatus.Text = "No script found";
                 _lblConnectionStatus.ForeColor = Color.Red;
@@ -215,11 +203,12 @@ namespace BirdsEye {
         /// </summary>
         private void HandleDisconnect() {
             _server.CloseConnection();
-            UpdateConnectionStatus();
-            _lstError.Items.Add("WARNING: Connection with script has been stopped.");
+            UpdateConnectionStatus(false);
             DisableCommandeer();
 
             _memory.ClearAddresses();
+
+            _lstError.Items.Add("WARNING: Connection with script has been stopped.");
 
             _commThread = new Thread(new ParameterizedThreadStart(_server.AcceptConnections));
             _commThread.Start(_config);
