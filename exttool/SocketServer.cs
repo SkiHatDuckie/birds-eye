@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -44,16 +45,34 @@ namespace BirdsEye {
         }
 
         /// <summary>
+        /// Blocks until a message is received from the python client.
+        /// Returns the received data as bytes.
+        /// </summary>
+        private (int, byte[]) ReceiveMessages() {
+            byte[] bytes = new byte[2048];
+            int numBytes = _clientStream!.Read(bytes, 0, bytes.Length);
+            return (numBytes, bytes);
+        }
+
+        /// <summary>
         /// Decode and return messages from the python client.<br/>
         /// Multiple messages are seperated by an '\n'.<br/>
         /// Precondition: Python client is connected to server.
         /// </summary>
-        public string[] GetRequests() {
-            byte[] bytes = new byte[2048];
-            int numBytes = _clientStream!.Read(bytes, 0, bytes.Length);
-            _log.Write(0, $"Received the following message: {Encoding.ASCII.GetString(bytes, 0, numBytes)}");
+        public Request[] ParseRequests() {
+            var data = ReceiveMessages();
+            _log.Write(0,
+                $@"Received the following message: {
+                    Encoding.ASCII.GetString(data.Item2, 0, data.Item1)
+                }"
+            );
+            string[] requests = Encoding.ASCII.GetString(data.Item2, 0, data.Item1)
+                .Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
 
-            return Encoding.ASCII.GetString(bytes, 0, numBytes).Split('\n');
+            return requests.Select(s => {
+                string[] request = s.Split(new char[] { ';' }, 2);
+                return new Request(request[0], request[1]);
+            }).ToArray();
         }
 
         /// <summary>

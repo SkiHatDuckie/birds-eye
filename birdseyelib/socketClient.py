@@ -1,5 +1,7 @@
 import socket
 
+from birdseyelib.response import Response
+
 
 class Client:
     """A socket client used to communicate with the external tool 
@@ -18,11 +20,11 @@ class Client:
         self.port = port
         self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection_status = -1
-
-        self.input_request = ""
+        self.payload = ""
+        self.latest_responses = []
 
     def connect(self):
-        """Attempt to connect to the external tool.
+        """(Blocking) Attempt to connect to the external tool.
 
         Call `Client.is_connected()` to see if the attempt was successful."""
         self.connection_status = self.client.connect_ex((self.ip, self.port))
@@ -41,21 +43,28 @@ class Client:
         """Returns true if client is connected to the external tool."""
         return self.connection_status == 0
 
-    def send_requests(self, objects):
-        """Send requests from any birdseye object to the external tool.
-
-        :param objects: A list of birdseye classes that interact with the external tool or \
-        BizHawk emulator.
-        :type objects: list
+    def _send_requests(self):
+        """(Internal) Send requests from any birdseye object to the external
+        tool.
 
         :precondition: client is connected to a socket."""
         try:
-            self.client.sendall(("".join([obj.request for obj in objects])).encode())
+            self.client.sendall(self.payload.encode())
+            self.payload = ""
         except:
             self.close()
 
-    def get_responses(self) -> str:
-        """Receive data collected by the external tool, and update each object in `objects` accordingly.
+    def _queue_request(self, request):
+        """(Internal) Append a string request to the queue to be
+        sent.
+        
+        :param request: The request to be added.
+        :type request: str"""
+        self.payload += request
+
+    def _receive_messages(self) -> str:
+        """(Internal) (Blocking) Wait to receive data collected by the external
+        tool.
 
         :precondition: client is connected to a socket."""
         try:
@@ -63,4 +72,37 @@ class Client:
         except:
             self.close()
 
+    def _parse_responses(self):
+        """(Internal) (Blocking) Parse received responses into a list of
+        objects.
+        
+        :precondition: client is connected to a socket."""
+        data = self._receive_messages()
+        if data:
+            responses = data.split("\n")
+            self.latest_responses.clear()
+            for response in responses:
+                if response != "":
+                    self.latest_responses.append(Response(*response.split(";", maxsplit=1)))
+
+    def _get_latest_response_data(self, tag) -> str:
+        """(Internal) Returns the latest response received with the given
+        `tag`. An empty string is returned if a response with `tag` cannot be
+        found.
+        
+        :param tag: The tag corresponding with the received data of interest.
+        :type tag: str"""
+        for response in self.latest_responses:
+            if tag == response.tag:
+                return response.data
+        
         return ""
+
+    def advance_frame(self):
+        """(Blocking) Sends all queued requests to the external tool and parses
+        received responses. This will subsequently advance the emulator to the
+        next frame.
+        
+        :precondition: client is connected to a socket."""
+        self._send_requests()
+        self._parse_responses()
