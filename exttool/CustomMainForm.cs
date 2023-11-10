@@ -33,9 +33,11 @@ namespace BirdsEye {
         private readonly FlowLayoutPanel _flpToolControls;
 
         private readonly GroupBox _grpRomInfo;
+        private readonly FlowLayoutPanel _flpRomInfo;
         private readonly Label _lblRomName;
 
         private readonly GroupBox _grpCommunications;
+        private readonly FlowLayoutPanel _flpCommunications;
         private readonly Label _lblCommMode;
         private readonly Button _btnChangeCommMode;
         private readonly Label _lblConnectionStatus;
@@ -80,30 +82,36 @@ namespace BirdsEye {
             _grpRomInfo = new GroupBox {
                 Text = "ROM Info",
                 Size = new Size(280, 160),
+                Padding = new Padding(5),
                 FlatStyle = FlatStyle.Flat,
             };
+            _flpRomInfo = new FlowLayoutPanel {
+                FlowDirection = FlowDirection.TopDown,
+                Dock = DockStyle.Fill,
+            };
             _lblRomName = new Label {
-                Location = new Point(15, 20),
                 AutoSize = true,
             };
             _grpCommunications = new GroupBox {
                 Text = "Communications",
                 Size = new Size(280, 160),
+                Padding = new Padding(8),
                 FlatStyle = FlatStyle.Flat,
+            };
+            _flpCommunications = new FlowLayoutPanel {
+                FlowDirection = FlowDirection.TopDown,
+                Dock = DockStyle.Fill,
             };
             _lblCommMode = new Label {
                 Text = "Communication Mode: Manual",
-                Location = new Point(15, 20),
                 AutoSize = true,
             };
             _btnChangeCommMode = new Button {
                 Text = "Change Mode",
-                Location = new Point(15, 40),
                 Size = new Size(100, 25),
             };
             _lblConnectionStatus = new Label {
                 Text = "No script found",
-                Location = new Point(15, 70),
                 AutoSize = true,
                 ForeColor = Color.Red,
             };
@@ -113,12 +121,14 @@ namespace BirdsEye {
             };
 
             _mainFormMenu.Items.Add(_optionSubMenu);
+            _flpRomInfo.Controls.Add(_lblRomName);
+            _grpRomInfo.Controls.Add(_flpRomInfo);
+            _flpCommunications.Controls.Add(_lblCommMode);
+            _flpCommunications.Controls.Add(_btnChangeCommMode);
+            _flpCommunications.Controls.Add(_lblConnectionStatus);
+            _grpCommunications.Controls.Add(_flpCommunications);
             _flpToolControls.Controls.Add(_grpRomInfo);
             _flpToolControls.Controls.Add(_grpCommunications);
-            _grpRomInfo.Controls.Add(_lblRomName);
-            _grpCommunications.Controls.Add(_lblCommMode);
-            _grpCommunications.Controls.Add(_btnChangeCommMode);
-            _grpCommunications.Controls.Add(_lblConnectionStatus);
             Controls.Add(_lstError);  // Must be added first for DockStype.Fill to work properly
             Controls.Add(_flpToolControls);
             Controls.Add(_mainFormMenu);
