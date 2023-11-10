@@ -1,6 +1,5 @@
 using System;
 using System.Drawing;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -30,10 +29,17 @@ namespace BirdsEye {
 
         private readonly MenuStrip _mainFormMenu;
         private readonly ToolStripMenuItem _optionSubMenu;
+
+        private readonly FlowLayoutPanel _flpToolControls;
+
+        private readonly GroupBox _grpRomInfo;
         private readonly Label _lblRomName;
+
+        private readonly GroupBox _grpCommunications;
         private readonly Label _lblCommMode;
         private readonly Button _btnChangeCommMode;
         private readonly Label _lblConnectionStatus;
+
         private readonly ListBox _lstError;
 
         protected override string WindowTitleStatic => "BirdsEye";
@@ -54,52 +60,68 @@ namespace BirdsEye {
 
             _log.Write(0, "Initializing main form.");
             FormClosing += OnFormClosing;
-            ClientSize = new Size(480, 320);
+            ClientSize = new Size(600, 480);
             SuspendLayout();
 
-            _lblRomName = new Label {
-                AutoSize = true,
-                Location = new Point(0, 30),
-            };
-            _lblCommMode = new Label {
-                AutoSize = true,
-                Location = new Point(240, 30),
-                Text = "Communication Mode: Manual"
-            };
-            _btnChangeCommMode = new Button {
-                Location = new Point(240, 50),
-                Size = new Size(100, 25),
-                Text = "Change Mode"
-            };
-            _lblConnectionStatus = new Label {
-                AutoSize = true,
-                Location = new Point(240, 80),
-                Text = "No script found",
-                ForeColor = Color.Red
-            };
-            _lstError = new ListBox {
-                Size = new Size(480, 100),
-                Location = new Point(0, 200),
-                ForeColor = Color.Red
+            _mainFormMenu = new MenuStrip {
+                Size = new Size(Width, 25),
+                Dock = DockStyle.Top,
             };
             _optionSubMenu = new ToolStripMenuItem {
+                Text = "&Options",
                 Size = new Size(50, 25),
-                Text = "&Options"
             };
-            _mainFormMenu = new MenuStrip {
-                Location = new Point(0, 0),
-                Size = new Size(Width, 25),
-                TabIndex = 0,
-                Text = "menuStrip1",
+            _flpToolControls = new FlowLayoutPanel {
+                FlowDirection = FlowDirection.LeftToRight,
+                AutoSize = true,
+                Dock = DockStyle.Top,
+                WrapContents = false,
+            };
+            _grpRomInfo = new GroupBox {
+                Text = "ROM Info",
+                Size = new Size(280, 160),
+                FlatStyle = FlatStyle.Flat,
+            };
+            _lblRomName = new Label {
+                Location = new Point(15, 20),
+                AutoSize = true,
+            };
+            _grpCommunications = new GroupBox {
+                Text = "Communications",
+                Size = new Size(280, 160),
+                FlatStyle = FlatStyle.Flat,
+            };
+            _lblCommMode = new Label {
+                Text = "Communication Mode: Manual",
+                Location = new Point(15, 20),
+                AutoSize = true,
+            };
+            _btnChangeCommMode = new Button {
+                Text = "Change Mode",
+                Location = new Point(15, 40),
+                Size = new Size(100, 25),
+            };
+            _lblConnectionStatus = new Label {
+                Text = "No script found",
+                Location = new Point(15, 70),
+                AutoSize = true,
+                ForeColor = Color.Red,
+            };
+            _lstError = new ListBox {
+                Dock = DockStyle.Fill,
+                ForeColor = Color.Red,
             };
 
             _mainFormMenu.Items.Add(_optionSubMenu);
+            _flpToolControls.Controls.Add(_grpRomInfo);
+            _flpToolControls.Controls.Add(_grpCommunications);
+            _grpRomInfo.Controls.Add(_lblRomName);
+            _grpCommunications.Controls.Add(_lblCommMode);
+            _grpCommunications.Controls.Add(_btnChangeCommMode);
+            _grpCommunications.Controls.Add(_lblConnectionStatus);
+            Controls.Add(_lstError);  // Must be added first for DockStype.Fill to work properly
+            Controls.Add(_flpToolControls);
             Controls.Add(_mainFormMenu);
-            Controls.Add(_lblRomName);
-            Controls.Add(_lblCommMode);
-            Controls.Add(_btnChangeCommMode);
-            Controls.Add(_lblConnectionStatus);
-            Controls.Add(_lstError);
             ResumeLayout();
 
             _optionSubMenu.Click += SubMenuOptionOnClick;
