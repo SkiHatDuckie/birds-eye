@@ -102,18 +102,21 @@ namespace BirdsEye {
             _lblSubmit = new Label {
                 Text = "",
                 ForeColor = Color.Blue,
-                Location = new Point(380, 235),
+                Location = new Point(390, 240),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
                 AutoSize = true,
             };
             _btnSubmit = new Button {
                 Text = "Submit",
-                Location = new Point(380, 270),
+                Location = new Point(390, 270),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Right,
                 AutoSize = true,
             };
             _lblError = new Label {
                 Text = "Close and reopen BirdsEye after submit for changes to take effect.",
                 ForeColor = Color.Red,
-                Location = new Point(0, Height - 72),
+                Anchor = AnchorStyles.Bottom | AnchorStyles.Left,
+                Location = new Point(15, 300),
                 AutoSize = true,
             };
 
