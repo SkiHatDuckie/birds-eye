@@ -10,11 +10,11 @@ namespace BirdsEye {
     [ExternalTool("BirdsEye")]
     public class CustomMainForm : ToolFormBase, IExternalToolForm {
         /// <remarks>
-		/// <see cref="ApiContainer"/> can be used as a shorthand for accessing 
+        /// <see cref="ApiContainer"/> can be used as a shorthand for accessing 
         /// the various APIs, more like the Lua syntax.
-		/// </remarks>
-		public ApiContainer? APIContainer { get; set; }
-		private ApiContainer APIs => APIContainer ?? throw new NullReferenceException();
+        /// </remarks>
+        public ApiContainer? APIContainer { get; set; }
+        private ApiContainer APIs => APIContainer ?? throw new NullReferenceException();
 
         private readonly Config _config = new();
         private readonly Logging _log;
