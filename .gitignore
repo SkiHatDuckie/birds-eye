@@ -1,7 +1,6 @@
 .vscode
 exttool/bin
 exttool/obj
-BizHawk/*
-!BizHawk
+BizHawk
 docs/_?*
 **/__pycache__
