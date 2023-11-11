@@ -8,7 +8,7 @@ using BizHawk.Client.EmuHawk;
 
 namespace BirdsEye {
     [ExternalTool("BirdsEye")]
-    public class CustomMainForm : ToolFormBase, IExternalToolForm {
+    public sealed partial class CustomMainForm : ToolFormBase, IExternalToolForm {
         /// <remarks>
         /// <see cref="ApiContainer"/> can be used as a shorthand for accessing 
         /// the various APIs, more like the Lua syntax.
@@ -27,23 +27,6 @@ namespace BirdsEye {
 
         private Thread _commThread;
 
-        private readonly MenuStrip _mainFormMenu;
-        private readonly ToolStripMenuItem _optionSubMenu;
-
-        private readonly FlowLayoutPanel _flpToolControls;
-
-        private readonly GroupBox _grpRomInfo;
-        private readonly FlowLayoutPanel _flpRomInfo;
-        private readonly Label _lblRomName;
-
-        private readonly GroupBox _grpCommunications;
-        private readonly FlowLayoutPanel _flpCommunications;
-        private readonly Label _lblCommMode;
-        private readonly Button _btnChangeCommMode;
-        private readonly Label _lblConnectionStatus;
-
-        private readonly ListBox _lstError;
-
         protected override string WindowTitleStatic => "BirdsEye";
 
         /// <summary>
@@ -61,81 +44,7 @@ namespace BirdsEye {
             _commThread.Start(_config);
 
             _log.Write(0, "Initializing main form.");
-            FormClosing += OnFormClosing;
-            ClientSize = new Size(600, 480);
-            SuspendLayout();
-
-            _mainFormMenu = new MenuStrip {
-                Size = new Size(Width, 25),
-                Dock = DockStyle.Top,
-            };
-            _optionSubMenu = new ToolStripMenuItem {
-                Text = "&Options",
-                Size = new Size(50, 25),
-            };
-            _flpToolControls = new FlowLayoutPanel {
-                FlowDirection = FlowDirection.LeftToRight,
-                AutoSize = true,
-                Dock = DockStyle.Top,
-                WrapContents = false,
-            };
-            _grpRomInfo = new GroupBox {
-                Text = "ROM Info",
-                Size = new Size(280, 160),
-                Padding = new Padding(5),
-                FlatStyle = FlatStyle.Flat,
-            };
-            _flpRomInfo = new FlowLayoutPanel {
-                FlowDirection = FlowDirection.TopDown,
-                Dock = DockStyle.Fill,
-            };
-            _lblRomName = new Label {
-                AutoSize = true,
-            };
-            _grpCommunications = new GroupBox {
-                Text = "Communications",
-                Size = new Size(280, 160),
-                Padding = new Padding(8),
-                FlatStyle = FlatStyle.Flat,
-            };
-            _flpCommunications = new FlowLayoutPanel {
-                FlowDirection = FlowDirection.TopDown,
-                Dock = DockStyle.Fill,
-            };
-            _lblCommMode = new Label {
-                Text = "Communication Mode: Manual",
-                AutoSize = true,
-            };
-            _btnChangeCommMode = new Button {
-                Text = "Change Mode",
-                Size = new Size(100, 25),
-            };
-            _lblConnectionStatus = new Label {
-                Text = "No script found",
-                AutoSize = true,
-                ForeColor = Color.Red,
-            };
-            _lstError = new ListBox {
-                Dock = DockStyle.Fill,
-                ForeColor = Color.Red,
-            };
-
-            _mainFormMenu.Items.Add(_optionSubMenu);
-            _flpRomInfo.Controls.Add(_lblRomName);
-            _grpRomInfo.Controls.Add(_flpRomInfo);
-            _flpCommunications.Controls.Add(_lblCommMode);
-            _flpCommunications.Controls.Add(_btnChangeCommMode);
-            _flpCommunications.Controls.Add(_lblConnectionStatus);
-            _grpCommunications.Controls.Add(_flpCommunications);
-            _flpToolControls.Controls.Add(_grpRomInfo);
-            _flpToolControls.Controls.Add(_grpCommunications);
-            Controls.Add(_lstError);  // Must be added first for DockStype.Fill to work properly
-            Controls.Add(_flpToolControls);
-            Controls.Add(_mainFormMenu);
-            ResumeLayout();
-
-            _optionSubMenu.Click += SubMenuOptionOnClick;
-            _btnChangeCommMode.Click += ChangeCommModeButtonOnClick;
+            InitializeControls();
         }
 
         /// <summary>
@@ -221,10 +130,10 @@ namespace BirdsEye {
         private void UpdateConnectionStatus(bool isConnected) {
             if (isConnected) {
                 _lblConnectionStatus.Text = "Script found";
-                _lblConnectionStatus.ForeColor = Color.Blue;
+                _lblConnectionStatus.ForeColor = ColorTheme.VistaBlue;
             } else {
                 _lblConnectionStatus.Text = "No script found";
-                _lblConnectionStatus.ForeColor = Color.Red;
+                _lblConnectionStatus.ForeColor = ColorTheme.BurntSienna;
             }
         }
 
