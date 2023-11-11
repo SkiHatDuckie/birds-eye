@@ -28,10 +28,7 @@ namespace BirdsEye {
         /// Add memory addresses from a string.
         ///</summary>
         public void AddAddressesFromString(string str) {
-            string[] addressList = str.Split(
-                new char[] {';'},
-                StringSplitOptions.RemoveEmptyEntries
-            );
+            string[] addressList = str.Trim(';').Split(';');
             foreach (string addr in addressList) {
                 AddAddress(Convert.ToInt64(addr, 10));
             }

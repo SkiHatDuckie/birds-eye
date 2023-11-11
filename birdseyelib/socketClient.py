@@ -79,11 +79,10 @@ class Client:
         :precondition: client is connected to a socket."""
         data = self._receive_messages()
         if data:
-            responses = data.split("\n")
+            responses = data.strip("\n").split("\n")
             self.latest_responses.clear()
             for response in responses:
-                if response != "":
-                    self.latest_responses.append(Response(*response.split(";", maxsplit=1)))
+                self.latest_responses.append(Response(*response.split(";", maxsplit=1)))
 
     def _get_latest_response_data(self, tag) -> str:
         """(Internal) Returns the latest response received with the given
