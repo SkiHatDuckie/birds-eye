@@ -1,6 +1,4 @@
 using System;
-using System.Drawing;
-using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -9,13 +7,13 @@ using BizHawk.Client.EmuHawk;
 
 namespace BirdsEye {
     [ExternalTool("BirdsEye")]
-    public class CustomMainForm : ToolFormBase, IExternalToolForm {
+    public sealed partial class CustomMainForm : ToolFormBase, IExternalToolForm {
         /// <remarks>
-		/// <see cref="ApiContainer"/> can be used as a shorthand for accessing 
+        /// <see cref="ApiContainer"/> can be used as a shorthand for accessing 
         /// the various APIs, more like the Lua syntax.
-		/// </remarks>
-		public ApiContainer? APIContainer { get; set; }
-		private ApiContainer APIs => APIContainer ?? throw new NullReferenceException();
+        /// </remarks>
+        public ApiContainer? APIContainer { get; set; }
+        private ApiContainer APIs => APIContainer ?? throw new NullReferenceException();
 
         private readonly Config _config = new();
         private readonly Logging _log;
@@ -27,14 +25,6 @@ namespace BirdsEye {
         private bool _commandeer = false;
 
         private Thread _commThread;
-
-        private readonly MenuStrip _mainFormMenu;
-        private readonly ToolStripMenuItem _optionSubMenu;
-        private readonly Label _lblRomName;
-        private readonly Label _lblCommMode;
-        private readonly Button _btnChangeCommMode;
-        private readonly Label _lblConnectionStatus;
-        private readonly ListBox _lstError;
 
         protected override string WindowTitleStatic => "BirdsEye";
 
@@ -53,57 +43,7 @@ namespace BirdsEye {
             _commThread.Start(_config);
 
             _log.Write(0, "Initializing main form.");
-            FormClosing += OnFormClosing;
-            ClientSize = new Size(480, 320);
-            SuspendLayout();
-
-            _lblRomName = new Label {
-                AutoSize = true,
-                Location = new Point(0, 30),
-            };
-            _lblCommMode = new Label {
-                AutoSize = true,
-                Location = new Point(240, 30),
-                Text = "Communication Mode: Manual"
-            };
-            _btnChangeCommMode = new Button {
-                Location = new Point(240, 50),
-                Size = new Size(100, 25),
-                Text = "Change Mode"
-            };
-            _lblConnectionStatus = new Label {
-                AutoSize = true,
-                Location = new Point(240, 80),
-                Text = "No script found",
-                ForeColor = Color.Red
-            };
-            _lstError = new ListBox {
-                Size = new Size(480, 100),
-                Location = new Point(0, 200),
-                ForeColor = Color.Red
-            };
-            _optionSubMenu = new ToolStripMenuItem {
-                Size = new Size(50, 25),
-                Text = "&Options"
-            };
-            _mainFormMenu = new MenuStrip {
-                Location = new Point(0, 0),
-                Size = new Size(Width, 25),
-                TabIndex = 0,
-                Text = "menuStrip1",
-            };
-
-            _mainFormMenu.Items.Add(_optionSubMenu);
-            Controls.Add(_mainFormMenu);
-            Controls.Add(_lblRomName);
-            Controls.Add(_lblCommMode);
-            Controls.Add(_btnChangeCommMode);
-            Controls.Add(_lblConnectionStatus);
-            Controls.Add(_lstError);
-            ResumeLayout();
-
-            _optionSubMenu.Click += SubMenuOptionOnClick;
-            _btnChangeCommMode.Click += ChangeCommModeButtonOnClick;
+            InitializeControls();
         }
 
         /// <summary>
@@ -189,10 +129,10 @@ namespace BirdsEye {
         private void UpdateConnectionStatus(bool isConnected) {
             if (isConnected) {
                 _lblConnectionStatus.Text = "Script found";
-                _lblConnectionStatus.ForeColor = Color.Blue;
+                _lblConnectionStatus.ForeColor = ColorTheme.VistaBlue;
             } else {
                 _lblConnectionStatus.Text = "No script found";
-                _lblConnectionStatus.ForeColor = Color.Red;
+                _lblConnectionStatus.ForeColor = ColorTheme.BurntSienna;
             }
         }
 
