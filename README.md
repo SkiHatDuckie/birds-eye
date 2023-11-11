@@ -18,8 +18,8 @@ I plan on adding a lot more as I continue to use this library myself.
 Tested using BizHawk version 2.6.2, however other versions *might* work.
 
 If you wish to develop the tool yourself, make sure to copy the contents of your BizHawk version
-into `BizHawk/`. The file tree should match the example shown in the
-[External Tool](#external-tool) section.
+into `BizHawk/` (you'll need to create the directory in the project).
+The file tree should match the example shown in the [External Tool](#external-tool) section.
 
 ## Setup
 
