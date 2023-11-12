@@ -4,7 +4,7 @@ Introduction
 birds-eye is a BizHawk external tool + python library, giving a (hopefully) convenient interface for python 
 scripts to communicate with the BizHawk emulator.
 
-This library is VERY bares bones at the moment, with only the current features available:
+This library is VERY bare bones at the moment, with only the current features available:
 
 * Connecting to the external tool
 * Retrieving memory data from the external tool
