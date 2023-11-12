@@ -66,8 +66,8 @@ namespace BirdsEye {
                     Encoding.ASCII.GetString(data.Item2, 0, data.Item1)
                 }"
             );
-            string[] requests = Encoding.ASCII.GetString(data.Item2, 0, data.Item1)
-                .Split(new char[] { '\n' }, StringSplitOptions.RemoveEmptyEntries);
+            string[] requests = Encoding.ASCII
+                .GetString(data.Item2, 0, data.Item1).Trim('\n').Split('\n');
 
             return requests.Select(s => {
                 string[] request = s.Split(new char[] { ';' }, 2);

@@ -31,7 +31,7 @@ namespace BirdsEye {
         /// to be executed when `ExecuteInput` is called.
         ///</summary>
         public void SetInputFromString(string str) {
-            string[] newState = str.Split(new char[] {';'}, StringSplitOptions.RemoveEmptyEntries);
+            string[] newState = str.Trim(';').Split(';');
             for (int i = 0; i < 6; i++) {
                 _inputState[i] = Convert.ToBoolean(newState[i]);
             }

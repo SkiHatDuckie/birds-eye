@@ -13,7 +13,7 @@ if __name__ == "__main__":
     external_tool = bird.ExternalTool(client)
 
     client.connect()
-    print("Conencting to server at {} on port {}.".format(HOST, PORT))
+    print("Connecting to server at {} on port {}.".format(HOST, PORT))
 
     # Add some arbitrary addresses to read from.
     memory.add_address(0x0057)
@@ -45,8 +45,11 @@ if __name__ == "__main__":
             client.advance_frame()
 
             print(
-                "Frame:" + str(emulation.get_framecount()) + ": " \
-                + " ".join([data for data in memory.get_memory()])
+                "Frame:" \
+                + str(emulation.get_framecount()) + ": " \
+                + " ".join([
+                    ":".join([str(addr), str(data)]) for addr, data in memory.get_memory().items()
+                ])
             )
 
             cnt += 1

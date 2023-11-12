@@ -93,6 +93,7 @@ namespace BirdsEye {
                         response += "INPUT;\n";
                     } else if (req.Tag == "CLOSE") {
                         HandleDisconnect();
+                        return;  // Short circuit to avoid sending an empty message.
                     } else if (req.Tag == "FRAME") {
                         response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
                     } else if (req.Tag == "COMMANDEER") {

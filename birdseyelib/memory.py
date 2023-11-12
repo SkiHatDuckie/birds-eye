@@ -3,7 +3,7 @@ class Memory:
     def __init__(self, client) -> None:
         self.client = client
         self.address_list = []
-        self.received_memory = ""
+        self.received_memory = {}
 
     def add_address(self, addr):
         """Adds an address for the external tool to return.
@@ -13,7 +13,7 @@ class Memory:
         :type addr: int"""
         if not str(addr) in self.address_list:
             self.address_list.append(str(addr))
-            self.received_memory += str(addr) + ":-1;"
+            self.received_memory[hex(addr)] = -1
 
     def add_address_range(self, start, end):
         """Adds a range of addresses from `start` to `end`, both inclusive.
@@ -33,16 +33,20 @@ class Memory:
         self.client._queue_request("MEMORY;" + ";".join(self.address_list) + "\n")
         self.address_list = []
 
-    def get_memory(self) -> list:
+    def get_memory(self) -> dict:
         """Gets the latest memory data received from the external tool. 
 
-        This will return a list of the latest values received from each address paired 
-        with the address it was read from, represented as:
+        This will return a copy of the dictionary containing the latest data
+        received from each requested address. Where the address
+        (in hexadecimal representation) is the key, and the data is the value
+        (in decimal representation).
 
-        `"addr:-1"`, if there has been no data received yet from an address
-
-        `"addr:data"`, with both `addr` and `data` in decimal form."""
+        The value is set to `-1` if no data has been received for that address."""
         data = self.client._get_latest_response_data("MEMORY")
         if data:
-            self.received_memory = data
-        return self.received_memory.split(";")
+            address_value_pairs = data.strip(";").split(";")
+            for addr_val_pair in address_value_pairs:
+                temp = addr_val_pair.split(":")
+                addr, val = temp[0], temp[1]
+                self.received_memory[hex(int(addr))] = int(val)
+        return self.received_memory.copy()
