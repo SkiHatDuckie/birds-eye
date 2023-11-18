@@ -11,6 +11,7 @@
 		<Reference Include="BizHawk.Client.Common" HintPath="$(BizHawkHomeDir)dll/BizHawk.Client.Common.dll" />
 		<Reference Include="BizHawk.Client.EmuHawk" HintPath="$(BizHawkHomeDir)EmuHawk.exe" />
 		<Reference Include="BizHawk.Common" HintPath="$(BizHawkHomeDir)dll/BizHawk.Common.dll" />
+        <Reference Include="BizHawk.Emulation.Common" HintPath="$(BizHawkHomeDir)dll/BizHawk.Emulation.Common.dll" />
 		<Reference Include="BizHawk.WinForms.Controls" HintPath="$(BizHawkHomeDir)dll/BizHawk.WinForms.Controls.dll" />
 	</ItemGroup>
 	<Target Name="PostBuild" AfterTargets="PostBuildEvent">
