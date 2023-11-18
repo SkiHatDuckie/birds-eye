@@ -7,7 +7,7 @@ namespace BirdsEye {
         // Default values
         public string host = "127.0.0.1";
         public int port = 8080;
-        public int logLevel = 0;
+        public int logLevel = 1;
         public int socketTimeout = 10000;
 
         public Config() {
