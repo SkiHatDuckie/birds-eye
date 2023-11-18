@@ -7,8 +7,7 @@ birds-eye communicates with the BizHawk emulator, which can be found `here`_.
 
 .. _here: https://tasvideos.org/Bizhawk
 
-Currently only BizHawk version 2.6.2 has been tested with the library and external tool, however other
-versions *might* work.
+The external tool should work as intended with all versions of BizHawk 2.9.X.
 
 The External Tool
 -----------------
