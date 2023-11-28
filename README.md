@@ -15,7 +15,8 @@ This library is VERY bares bones at the moment, with only the current features a
 
 I plan on adding a lot more as I continue to use this library myself.
 
-Tested using BizHawk version 2.6.2, however other versions *might* work.
+This external tool was built using version 2.9.1 of BizHawk, however, all versions of 2.9.x
+should work as intended.
 
 If you wish to develop the tool yourself, make sure to copy the contents of your BizHawk version
 into `BizHawk/` (you'll need to create the directory in the project).

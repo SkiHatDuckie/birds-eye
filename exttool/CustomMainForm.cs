@@ -64,7 +64,8 @@ namespace BirdsEye {
                 if (!_commThread.IsAlive) {
                     _commThread.Join();
                 }
-                if (APIs.GameInfo.GetRomName() != "Null") {
+                string? romName = APIs.Emulation.GetGameInfo()?.Name;
+                if (romName != null || romName != "Null") {
                     ProcessRequests();
                     if (_commandeer) {
                         _input.ExecuteInput(APIs);
@@ -116,8 +117,9 @@ namespace BirdsEye {
         /// Change the text of `_lblRomName` to display the current rom.
         /// </summary>
         private void DisplayLoadedRom() {
-            if (APIs.GameInfo.GetRomName() != "Null") {
-                _lblRomName.Text = $"Currently loaded: {APIs.GameInfo.GetRomName()}";
+            string? romName = APIs.Emulation.GetGameInfo()?.Name;
+            if (romName != null || romName != "Null") {
+                _lblRomName.Text = $"Currently loaded: {romName}";
             } else {
                 _lblRomName.Text = "Currently loaded: Nothing";
             }
@@ -159,11 +161,12 @@ namespace BirdsEye {
         /// Checks if external tool should switch to commandeer.
         /// </summary>
         private bool CanCommandeer() {
+            string? romName = APIs.Emulation.GetGameInfo()?.Name;
             if (!_server.IsConnected()) {
                 _log.Write(2, "Cannot switch to commandeer when no script is connected.");
                 _lstError.Items.Add("ERROR: No script is connected.");
                 return false;
-            } else if (APIs.GameInfo.GetRomName() == "Null") {
+            } else if (romName == null || romName == "Null") {
                 _log.Write(2, "Cannot switch to commandeer when no ROM has been loaded.");
                 _lstError.Items.Add("ERROR: No ROM has been loaded.");
                 return false;
