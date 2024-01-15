@@ -17,6 +17,7 @@ namespace BirdsEye {
         public Label _lblCommMode;
         public Button _btnChangeCommMode;
         public Label _lblConnectionStatus;
+        public Button _btnDisconnectClient;
 
         public ListBox _lstError;
 
@@ -78,6 +79,10 @@ namespace BirdsEye {
                 Text = "No script found",
                 AutoSize = true,
             };
+            _btnDisconnectClient = new Button {
+                Text = "Disconnect",
+                Size = new Size(100, 25),
+            };
             _lstError = new ListBox {
                 Dock = DockStyle.Fill,
             };
@@ -88,6 +93,7 @@ namespace BirdsEye {
             _flpCommunications.Controls.Add(_lblCommMode);
             _flpCommunications.Controls.Add(_btnChangeCommMode);
             _flpCommunications.Controls.Add(_lblConnectionStatus);
+            _flpCommunications.Controls.Add(_btnDisconnectClient);
             _grpCommunications.Controls.Add(_flpCommunications);
             _flpToolControls.Controls.Add(_grpRomInfo);
             _flpToolControls.Controls.Add(_grpCommunications);
@@ -101,6 +107,7 @@ namespace BirdsEye {
 
             _optionSubMenu.Click += SubMenuOptionOnClick;
             _btnChangeCommMode.Click += ChangeCommModeButtonOnClick;
+            _btnDisconnectClient.Click += DisconnectClientButtonOnClick;
         }
     }
 }

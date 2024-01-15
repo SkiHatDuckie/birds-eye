@@ -208,6 +208,18 @@ namespace BirdsEye {
         }
 
         /// <summary>
+        /// Disconnect the client.
+        /// Displays a message if no client is already connected.
+        /// </summary>
+        private void DisconnectClientButtonOnClick(object sender, EventArgs e) {
+            if (!_server.IsConnected()) {
+                _lstError.Items.Add("ERROR: No script is connected.");
+            } else {
+                _server.CloseConnection();
+            }
+        }
+
+        /// <summary>
         /// Opens an instance of the options form.
         /// </summary>
         private void SubMenuOptionOnClick(object sender, EventArgs e) {
