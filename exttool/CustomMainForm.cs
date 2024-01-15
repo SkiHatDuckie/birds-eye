@@ -65,7 +65,7 @@ namespace BirdsEye {
                     _commThread.Join();
                 }
                 string? romName = APIs.Emulation.GetGameInfo()?.Name;
-                if (romName != null || romName != "Null") {
+                if (romName != null && romName != "Null") {
                     ProcessRequests();
                     if (_commandeer) {
                         _input.ExecuteInput(APIs);
