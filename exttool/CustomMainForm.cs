@@ -215,7 +215,7 @@ namespace BirdsEye {
             if (!_server.IsConnected()) {
                 _lstError.Items.Add("ERROR: No script is connected.");
             } else {
-                _server.CloseConnection();
+                HandleDisconnect();
             }
         }
 
