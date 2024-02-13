@@ -19,6 +19,8 @@ namespace BirdsEye {
         public GroupBoxEx _grpSocket;
         public Label _lblTimeout;
         public TextBox _txtTimeout;
+        public Label _lblBufSize;
+        public TextBox _txtBufSize;
 
         public Label _lblSubmit;
         public Button _btnSubmit;
@@ -97,6 +99,16 @@ namespace BirdsEye {
                 Location = new Point(15, 40),
                 AutoSize = true,
             };
+            _lblBufSize = new Label {
+                Text = "Receiver Buffer Size (bytes):",
+                Location = new Point(15, 65),
+                AutoSize = true,
+            };
+            _txtBufSize = new TextBox {
+                Text = _config.socketBufSize.ToString(),
+                Location = new Point(15, 85),
+                AutoSize = true,
+            };
             _lblSubmit = new Label {
                 Text = "",
                 Location = new Point(390, 240),
@@ -128,6 +140,8 @@ namespace BirdsEye {
             _grpLogging.Controls.Add(_lblLogLevelRange);
             _grpSocket.Controls.Add(_lblTimeout);
             _grpSocket.Controls.Add(_txtTimeout);
+            _grpSocket.Controls.Add(_lblBufSize);
+            _grpSocket.Controls.Add(_txtBufSize);
             Controls.Add(_tlpOptionGroups);
             Controls.Add(_lblSubmit);
             Controls.Add(_btnSubmit);

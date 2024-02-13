@@ -11,27 +11,31 @@ namespace BirdsEye {
         private readonly int _port;
         private readonly IPAddress _host;
         private readonly Logging _log;
+        private readonly int _recvTimeout;
+        private readonly int _bufSize;
 
         /// <summary>
         /// Create a socket server object that listens for 
         /// connections at a given port and address.
         /// </summary>
-        public SocketServer(Logging log, string host, int port) {
+        public SocketServer(Logging log, string host, int port, int recvTimeout, int bufSize) {
             _log = log;
             _port = port;
             _host = IPAddress.Parse(host);
             _server = new TcpListener(_host, _port);
+            _recvTimeout = recvTimeout;
+            _bufSize = bufSize;
         }
 
         /// <summary>
         /// Accept a connection request from a python client.
         /// </summary>
-        public void AcceptConnections(object config) {
+        public void AcceptConnections() {
             _log.Write(1, "Accepting connection request from python client.");
             _server.Start();
             _client = _server.AcceptTcpClient();
             _clientStream = _client.GetStream();
-            _client.ReceiveTimeout = ((Config) config).socketTimeout;
+            _client.ReceiveTimeout = _recvTimeout;
             _client.SendTimeout = 10000;
             _server.Stop();
         }
@@ -48,9 +52,9 @@ namespace BirdsEye {
         /// Returns the received data as bytes.
         /// </summary>
         private (int, byte[]) ReceiveMessages() {
-            byte[] bytes = new byte[2048];
-            int numBytes = _clientStream!.Read(bytes, 0, bytes.Length);
-            return (numBytes, bytes);
+            byte[] buffer = new byte[_bufSize];
+            int numBytes = _clientStream!.Read(buffer, 0, buffer.Length);
+            return (numBytes, buffer);
         }
 
         /// <summary>
@@ -61,7 +65,7 @@ namespace BirdsEye {
         public Request[] ParseRequests() {
             var data = ReceiveMessages();
             _log.Write(0,
-                $@"Received the following message: {
+                $@"Received {data.Item1} bytes: {
                     Encoding.ASCII.GetString(data.Item2, 0, data.Item1)
                 }"
             );

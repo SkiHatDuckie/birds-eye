@@ -68,9 +68,23 @@ class Client:
         tool.
 
         :precondition: client is connected to a socket."""
+        message = ""
+        bufsize = 2048
         try:
-            return self.client.recv(2048).decode()
-        except:
+            message = self.client.recv(bufsize).decode()
+            if (len(message) >= bufsize):  # Full message is possibly larger than `bufsize`
+                self.client.setblocking(False)
+                try:
+                    temp = self.client.recv(bufsize).decode()
+                    while (True):
+                        message += temp
+                        temp = self.client.recv(bufsize).decode()
+                except:  # `socket.recv` will raise an exception if empty.
+                    pass
+                self.client.setblocking(True)
+            return message
+        except InterruptedError:
+            print("ERROR THROWN!!!!\n")
             self.close()
 
     def _parse_responses(self):

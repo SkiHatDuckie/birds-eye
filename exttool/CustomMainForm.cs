@@ -34,13 +34,14 @@ namespace BirdsEye {
         /// </summary>
         public CustomMainForm() {
             _log = new Logging(_config.logLevel);
-            _server = new SocketServer(_log, _config.host, _config.port);
+            _server = new SocketServer(_log, _config.host, _config.port, _config.socketTimeout,
+                _config.socketBufSize);
             _memory = new Memory(_log);
             _input = new ControllerInput(_log);
             _emulation = new Emulation(_log);
 
-            _commThread = new Thread(new ParameterizedThreadStart(_server.AcceptConnections));
-            _commThread.Start(_config);
+            _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
+            _commThread.Start();
 
             _log.Write(0, "Initializing main form.");
             InitializeControls();
@@ -153,8 +154,8 @@ namespace BirdsEye {
 
             _lstError.Items.Add("WARNING: Connection with script has been stopped.");
 
-            _commThread = new Thread(new ParameterizedThreadStart(_server.AcceptConnections));
-            _commThread.Start(_config);
+            _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
+            _commThread.Start();
         }
 
         /// <summary>
