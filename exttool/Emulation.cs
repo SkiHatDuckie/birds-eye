@@ -11,5 +11,9 @@ namespace BirdsEye {
         public string GetFramecount(ApiContainer APIs) {
             return APIs.Emulation.FrameCount().ToString();
         }
+
+        public string GetBoardName(ApiContainer APIs) {
+            return APIs.Emulation.GetBoardName();
+        }
     }
 }

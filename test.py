@@ -38,6 +38,7 @@ if __name__ == "__main__":
             memory.request_memory()
             controller_input.set_controller_input(right=True)
             emulation.request_framecount()
+            emulation.request_board_name()
             # if cnt == 0:
             #     external_tool.set_commandeer(True)
 
@@ -45,8 +46,8 @@ if __name__ == "__main__":
             client.advance_frame()
 
             print(
-                "Frame:" \
-                + str(emulation.get_framecount()) + ": " \
+                "Frame:" + str(emulation.get_framecount()) + ": " \
+                + "Board:" + emulation.get_board_name() + ": " \
                 + " ".join([
                     ":".join([str(addr), str(data)]) for addr, data in memory.get_memory().items()
                 ])

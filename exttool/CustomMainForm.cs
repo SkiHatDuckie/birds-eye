@@ -98,6 +98,8 @@ namespace BirdsEye {
                         return;  // Short circuit to avoid sending an empty message.
                     } else if (req.Tag == "FRAME") {
                         response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
+                    } else if (req.Tag == "BOARD") {
+                        response += "BOARD;" + _emulation.GetBoardName(APIs) + "\n";
                     } else if (req.Tag == "COMMANDEER") {
                         if (req.Data == "True") {
                             EnableCommandeer();
