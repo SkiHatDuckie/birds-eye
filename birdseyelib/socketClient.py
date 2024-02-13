@@ -84,7 +84,6 @@ class Client:
                 self.client.setblocking(True)
             return message
         except InterruptedError:
-            print("ERROR THROWN!!!!\n")
             self.close()
 
     def _parse_responses(self):
