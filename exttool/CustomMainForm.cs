@@ -84,28 +84,34 @@ namespace BirdsEye {
             try {
                 string response = "";
                 foreach (Request req in _server.ParseRequests()) {
-                    if (req.Tag == "MEMORY") {
-                        if (!string.IsNullOrEmpty(req.Data)) {
-                            _memory.AddAddressesFromString(req.Data);
-                        }
-                        _memory.ReadMemory(APIs);
-                        response += "MEMORY;" + _memory.FormatMemory() + "\n";
-                    } else if (req.Tag == "INPUT") {
-                        _input.SetInputFromString(req.Data);
-                        response += "INPUT;\n";
-                    } else if (req.Tag == "CLOSE") {
-                        HandleDisconnect();
-                        return;  // Short circuit to avoid sending an empty message.
-                    } else if (req.Tag == "FRAME") {
-                        response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
-                    } else if (req.Tag == "BOARD") {
-                        response += "BOARD;" + _emulation.GetBoardName(APIs) + "\n";
-                    } else if (req.Tag == "COMMANDEER") {
-                        if (req.Data == "True") {
-                            EnableCommandeer();
-                        } else {
-                            DisableCommandeer();
-                        }
+                    switch (req.Tag) {
+                        case "MEMORY":
+                            if (!string.IsNullOrEmpty(req.Data)) {
+                                _memory.AddAddressesFromString(req.Data);
+                            }
+                            _memory.ReadMemory(APIs);
+                            response += "MEMORY;" + _memory.FormatMemory() + "\n";
+                            break;
+                        case "INPUT":
+                            _input.SetInputFromString(req.Data);
+                            response += "INPUT;\n";
+                            break;
+                        case "CLOSE":
+                            HandleDisconnect();
+                            return;  // Short circuit to avoid sending an empty message.
+                        case "FRAME":
+                            response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
+                            break;
+                        case "BOARD":
+                            response += "BOARD;" + _emulation.GetBoardName(APIs) + "\n";
+                            break;
+                        case "COMMANDEER":
+                            if (req.Data == "True") {
+                                EnableCommandeer();
+                            } else {
+                                DisableCommandeer();
+                            }
+                            break;
                     }
                 }
                 _server.SendMessage(response);
