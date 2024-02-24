@@ -46,6 +46,7 @@ namespace BirdsEye {
             _requestDictionary = new Dictionary<string, Func<string, Response>>() {
                 { "ADDRESS", (req) => _memory.AddAddressesFromRequest(req) },
                 { "MEMORY", (req) => _memory.MemoryOnRequest(APIs) },
+                { "COM_GET", (req) => new Response(_commandeer.ToString()) },
                 { "INPUT", (req) => _input.InputOnRequest(req) },
                 { "FRAME", (req) => _emulation.GetFramecount(APIs) },
                 { "BOARD", (req) => _emulation.GetBoardName(APIs) },
@@ -98,7 +99,7 @@ namespace BirdsEye {
                     if (req.Tag == "CLOSE") {
                         HandleDisconnect();
                         return;  // Short circuit to avoid sending an empty message.
-                    } else if (req.Tag == "COMMANDEER") {
+                    } else if (req.Tag == "COM_SET") {
                         if (req.Data == "True") {
                             EnableCommandeer();
                         } else {
