@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -22,6 +23,8 @@ namespace BirdsEye {
         private readonly ControllerInput _input;
         private readonly Emulation _emulation;
 
+        private readonly Dictionary<string, Func<string, string>> _requestDictionary;
+
         private bool _commandeer = false;
 
         private Thread _commThread;
@@ -39,6 +42,13 @@ namespace BirdsEye {
             _memory = new Memory(_log);
             _input = new ControllerInput(_log);
             _emulation = new Emulation(_log);
+
+            _requestDictionary = new Dictionary<string, Func<string, string>>() {
+                { "MEMORY", (req) => _memory.MemoryOnRequest(req, APIs) },
+                { "INPUT", (req) => _input.InputOnRequest(req) },
+                { "FRAME", (req) => _emulation.GetFramecount(APIs) },
+                { "BOARD", (req) => _emulation.GetBoardName(APIs) },
+            };
 
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
             _commThread.Start();
@@ -84,34 +94,22 @@ namespace BirdsEye {
             try {
                 string response = "";
                 foreach (Request req in _server.ParseRequests()) {
-                    switch (req.Tag) {
-                        case "MEMORY":
-                            if (!string.IsNullOrEmpty(req.Data)) {
-                                _memory.AddAddressesFromString(req.Data);
-                            }
-                            _memory.ReadMemory(APIs);
-                            response += "MEMORY;" + _memory.FormatMemory() + "\n";
-                            break;
-                        case "INPUT":
-                            _input.SetInputFromString(req.Data);
-                            response += "INPUT;\n";
-                            break;
-                        case "CLOSE":
-                            HandleDisconnect();
-                            return;  // Short circuit to avoid sending an empty message.
-                        case "FRAME":
-                            response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
-                            break;
-                        case "BOARD":
-                            response += "BOARD;" + _emulation.GetBoardName(APIs) + "\n";
-                            break;
-                        case "COMMANDEER":
-                            if (req.Data == "True") {
-                                EnableCommandeer();
-                            } else {
-                                DisableCommandeer();
-                            }
-                            break;
+                    if (req.Tag == "CLOSE") {
+                        HandleDisconnect();
+                        return;  // Short circuit to avoid sending an empty message.
+                    } else if (req.Tag == "COMMANDEER") {
+                        if (req.Data == "True") {
+                            EnableCommandeer();
+                        } else {
+                            DisableCommandeer();
+                        }
+                    } else {
+                        try {
+                            response += req.Tag + ";" + _requestDictionary[req.Tag](req.Data)
+                                + "\n";
+                        } catch (KeyNotFoundException) {
+                            _log.Write(2, $"Unknown request tag: {req.Tag}.");
+                        }
                     }
                 }
                 _server.SendMessage(response);

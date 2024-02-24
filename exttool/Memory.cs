@@ -75,5 +75,13 @@ namespace BirdsEye {
             _addressList.Clear();
             _memoryList.Clear();
         }
+
+        public string MemoryOnRequest(string req, ApiContainer APIs) {
+            if (!string.IsNullOrEmpty(req)) {
+                AddAddressesFromString(req);
+            }
+            ReadMemory(APIs);
+            return FormatMemory();
+        }
     }
 }

@@ -36,5 +36,10 @@ namespace BirdsEye {
                 _inputState[i] = Convert.ToBoolean(newState[i]);
             }
         }
+
+        public string InputOnRequest(string req) {
+            SetInputFromString(req);
+            return "";
+        }
     }
 }
