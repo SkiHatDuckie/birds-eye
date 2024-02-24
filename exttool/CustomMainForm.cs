@@ -182,18 +182,12 @@ namespace BirdsEye {
             return true;
         }
 
-        /// <summary>
-        /// Switches the communication mode to commandeer.
-        /// </summary>
         private void EnableCommandeer() {
             _log.Write(1, "Communication mode set to commandeer.");
             _commandeer = true;
             _lblCommMode.Text = "Communication Mode: Commandeer";
         }
 
-        /// <summary>
-        /// Switches the communication mode to manual.
-        /// </summary>
         private void DisableCommandeer() {
             _log.Write(1, "Communication mode set to manual.");
             _commandeer = false;
@@ -216,8 +210,7 @@ namespace BirdsEye {
         }
 
         /// <summary>
-        /// Disconnect the client.
-        /// Displays a message if no client is already connected.
+        /// Displays a message in `_lstError` if no client is already connected.
         /// </summary>
         private void DisconnectClientButtonOnClick(object sender, EventArgs e) {
             if (!_server.IsConnected()) {

@@ -25,7 +25,6 @@ namespace BirdsEye {
         }
 
         ///<summary>
-        /// Add memory addresses from a request.
         /// Returns nothing as a response.
         ///</summary>
         public Response AddAddressesFromRequest(string req) {
