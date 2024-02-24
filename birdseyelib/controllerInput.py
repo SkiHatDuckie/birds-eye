@@ -29,4 +29,4 @@ class ControllerInput:
         controller_input = bool_to_string[a] + ";" + bool_to_string[b] + ";" + \
                            bool_to_string[up] + ";" + bool_to_string[down] + ";" + \
                            bool_to_string[right] + ";" + bool_to_string[left]
-        self.client._queue_request("INPUT;" + controller_input + "\n")
+        self.client._queue_request("INP_SET;" + controller_input + "\n")

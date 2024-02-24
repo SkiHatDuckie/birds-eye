@@ -28,20 +28,14 @@ namespace BirdsEye {
 
         ///<summary>
         /// Set the controller input from a string containing the state of different buttons
-        /// to be executed when `ExecuteInput` is called.
+        /// to be executed when `ExecuteInput` is called. <br/>
+        /// Returns nothing as a response.
         ///</summary>
-        public void SetInputFromString(string str) {
+        public Response SetInputFromString(string str) {
             string[] newState = str.Trim(';').Split(';');
             for (int i = 0; i < 6; i++) {
                 _inputState[i] = Convert.ToBoolean(newState[i]);
             }
-        }
-
-        /// <summary>
-        /// Returns nothing as a response.
-        /// </summary>
-        public Response InputOnRequest(string req) {
-            SetInputFromString(req);
             return new Response("");
         }
     }

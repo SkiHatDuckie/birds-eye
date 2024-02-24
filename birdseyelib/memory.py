@@ -31,9 +31,9 @@ class Memory:
     def request_memory(self):
         """Requests for the latest memory data from the external tool."""
         if self.address_list != []:
-            self.client._queue_request("ADDRESS;" + ";".join(self.address_list) + "\n")
+            self.client._queue_request("MEM_ADDRESS;" + ";".join(self.address_list) + "\n")
             self.address_list = []
-        self.client._queue_request("MEMORY;\n")
+        self.client._queue_request("MEM_READ;\n")
 
     def get_memory(self) -> dict:
         """Gets the latest memory data received from the external tool. 
@@ -44,7 +44,7 @@ class Memory:
         (in decimal representation).
 
         The value is set to `-1` if no data has been received for that address."""
-        data = self.client._get_latest_response_data("MEMORY")
+        data = self.client._get_latest_response_data("MEM_READ")
         if data:
             address_value_pairs = data.strip(";").split(";")
             for addr_val_pair in address_value_pairs:

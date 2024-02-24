@@ -27,7 +27,7 @@ namespace BirdsEye {
         ///<summary>
         /// Returns nothing as a response.
         ///</summary>
-        public Response AddAddressesFromRequest(string req) {
+        public Response AddAddressesFromString(string req) {
             if (!string.IsNullOrEmpty(req)) {
                 string[] addressList = req.Trim(';').Split(';');
                 foreach (string addr in addressList) {
