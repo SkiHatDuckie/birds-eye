@@ -44,7 +44,8 @@ namespace BirdsEye {
             _emulation = new Emulation(_log);
 
             _requestDictionary = new Dictionary<string, Func<string, string>>() {
-                { "MEMORY", (req) => _memory.MemoryOnRequest(req, APIs) },
+                { "ADDRESS", (req) => _memory.AddAddressesFromRequest(req) },
+                { "MEMORY", (req) => _memory.MemoryOnRequest(APIs) },
                 { "INPUT", (req) => _input.InputOnRequest(req) },
                 { "FRAME", (req) => _emulation.GetFramecount(APIs) },
                 { "BOARD", (req) => _emulation.GetBoardName(APIs) },

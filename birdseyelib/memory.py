@@ -30,8 +30,10 @@ class Memory:
 
     def request_memory(self):
         """Requests for the latest memory data from the external tool."""
-        self.client._queue_request("MEMORY;" + ";".join(self.address_list) + "\n")
-        self.address_list = []
+        if self.address_list != []:
+            self.client._queue_request("ADDRESS;" + ";".join(self.address_list) + "\n")
+            self.address_list = []
+        self.client._queue_request("MEMORY;\n")
 
     def get_memory(self) -> dict:
         """Gets the latest memory data received from the external tool. 
