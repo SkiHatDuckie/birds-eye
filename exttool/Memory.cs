@@ -26,16 +26,16 @@ namespace BirdsEye {
 
         ///<summary>
         /// Add memory addresses from a request.
-        /// Returns an empty string on completion.
+        /// Returns nothing as a response.
         ///</summary>
-        public string AddAddressesFromRequest(string req) {
+        public Response AddAddressesFromRequest(string req) {
             if (!string.IsNullOrEmpty(req)) {
                 string[] addressList = req.Trim(';').Split(';');
                 foreach (string addr in addressList) {
                     AddAddress(Convert.ToInt64(addr, 10));
                 }
             }
-            return "";
+            return new Response("");
         }
 
         ///<summary>
@@ -80,9 +80,9 @@ namespace BirdsEye {
             _memoryList.Clear();
         }
 
-        public string MemoryOnRequest(ApiContainer APIs) {
+        public Response MemoryOnRequest(ApiContainer APIs) {
             ReadMemory(APIs);
-            return FormatMemory();
+            return new Response(FormatMemory());
         }
     }
 }

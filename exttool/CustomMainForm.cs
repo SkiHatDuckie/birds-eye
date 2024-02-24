@@ -23,7 +23,7 @@ namespace BirdsEye {
         private readonly ControllerInput _input;
         private readonly Emulation _emulation;
 
-        private readonly Dictionary<string, Func<string, string>> _requestDictionary;
+        private readonly Dictionary<string, Func<string, Response>> _requestDictionary;
 
         private bool _commandeer = false;
 
@@ -43,7 +43,7 @@ namespace BirdsEye {
             _input = new ControllerInput(_log);
             _emulation = new Emulation(_log);
 
-            _requestDictionary = new Dictionary<string, Func<string, string>>() {
+            _requestDictionary = new Dictionary<string, Func<string, Response>>() {
                 { "ADDRESS", (req) => _memory.AddAddressesFromRequest(req) },
                 { "MEMORY", (req) => _memory.MemoryOnRequest(APIs) },
                 { "INPUT", (req) => _input.InputOnRequest(req) },

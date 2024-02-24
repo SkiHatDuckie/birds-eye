@@ -37,9 +37,12 @@ namespace BirdsEye {
             }
         }
 
-        public string InputOnRequest(string req) {
+        /// <summary>
+        /// Returns nothing as a response.
+        /// </summary>
+        public Response InputOnRequest(string req) {
             SetInputFromString(req);
-            return "";
+            return new Response("");
         }
     }
 }
