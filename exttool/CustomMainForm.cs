@@ -47,6 +47,7 @@ namespace BirdsEye {
                 { "MEM_ADDRESS", (req) => _memory.AddAddressesFromString(req) },
                 { "MEM_READ", (req) => _memory.MemoryOnRequest(APIs) },
                 { "COM_GET", (req) => new Response(_commandeer.ToString()) },
+                { "COM_SET", (req) => ChangeCommMode(req == "True") },
                 { "INP_SET", (req) => _input.SetInputFromString(req) },
                 { "EMU_FRAME", (req) => _emulation.GetFramecount(APIs) },
                 { "EMU_BOARD", (req) => _emulation.GetBoardName(APIs) },
@@ -99,12 +100,6 @@ namespace BirdsEye {
                     if (req.Tag == "CLOSE") {
                         HandleDisconnect();
                         return;  // Short circuit to avoid sending an empty message.
-                    } else if (req.Tag == "COM_SET") {
-                        if (req.Data == "True") {
-                            EnableCommandeer();
-                        } else {
-                            DisableCommandeer();
-                        }
                     } else {
                         try {
                             response += req.Tag + ";" + _requestDictionary[req.Tag](req.Data)
@@ -156,12 +151,9 @@ namespace BirdsEye {
         private void HandleDisconnect() {
             _server.CloseConnection();
             UpdateConnectionStatus(false);
-            DisableCommandeer();
-
+            ChangeCommMode(false);
             _memory.ClearAddresses();
-
             _lstError.Items.Add("WARNING: Connection with script has been stopped.");
-
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
             _commThread.Start();
         }
@@ -183,16 +175,12 @@ namespace BirdsEye {
             return true;
         }
 
-        private void EnableCommandeer() {
-            _log.Write(1, "Communication mode set to commandeer.");
-            _commandeer = true;
-            _lblCommMode.Text = "Communication Mode: Commandeer";
-        }
-
-        private void DisableCommandeer() {
-            _log.Write(1, "Communication mode set to manual.");
-            _commandeer = false;
-            _lblCommMode.Text = "Communication Mode: Manual";
+        private Response ChangeCommMode(bool enable_commandeer) {
+            string modeName = enable_commandeer ? "Commandeer" : "Manual";
+            _log.Write(1, $"Communication mode set to {modeName.ToLower()}.");
+            _commandeer = enable_commandeer;
+            _lblCommMode.Text = $"Communication Mode: {modeName}";
+            return new Response("");
         }
 
         /// <summary>
@@ -202,11 +190,7 @@ namespace BirdsEye {
         /// </summary>
         private void ChangeCommModeButtonOnClick(object sender, EventArgs e) {
             if (CanCommandeer()) {
-                if (!_commandeer) {
-                    EnableCommandeer();
-                } else {
-                    DisableCommandeer();
-                }
+                ChangeCommMode(!_commandeer);
             }
         }
 
