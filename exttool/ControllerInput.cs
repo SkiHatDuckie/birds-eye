@@ -22,6 +22,7 @@ namespace BirdsEye {
             _log.Write(1, $"Changing joypad layout to {newJoypad}.");
             _joypad = newJoypad switch {
                 "NES" => new NESJoypad(),
+                "GB(C)" => new GBAndGBCJoypad(),
                 _ => _joypad
             };
             return new Response("");

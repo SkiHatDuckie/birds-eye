@@ -19,4 +19,19 @@ namespace BirdsEye {
             };
         }
     }
+
+    public class GBAndGBCJoypad : Joypad {
+        public GBAndGBCJoypad() {
+            Controls = new Dictionary<string, bool>() {
+                {"A", false},
+                {"B", false},
+                {"Up", false},
+                {"Down", false},
+                {"Right", false},
+                {"Left", false},
+                {"Select", false},
+                {"Start", false},
+            };
+        }
+    }
 }
