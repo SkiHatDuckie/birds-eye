@@ -15,6 +15,7 @@ class NESJoypad(Joypad):
             "Select": False, "Start": False,
         }
 
+
 class GBAndGBCJoypad(Joypad):
     """Controller mapping for the GB and GBC.
     
@@ -25,4 +26,17 @@ class GBAndGBCJoypad(Joypad):
         self.controls = {
             "A": False, "B": False, "Up": False, "Down": False, "Right": False, "Left": False,
             "Select": False, "Start": False,
+        }
+
+
+class SNESJoypad(Joypad):
+    """Controller mapping for the SNES.
+    
+    The \"Power\" and \"Reset\" buttons are not implemented for the time being."""
+    def __init__(self):
+        super().__init__()
+        self._name = "SNES"
+        self.controls = {
+            "A": False, "B": False, "L": False, "R": False, "X": False, "Y": False, "Up": False,
+            "Down": False, "Right": False, "Left": False, "Select": False, "Start": False,
         }

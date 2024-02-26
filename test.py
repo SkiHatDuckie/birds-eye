@@ -1,5 +1,5 @@
 import birdseyelib as bird
-from birdseyelib.joypad import GBAndGBCJoypad
+from birdseyelib.joypad import SNESJoypad
 import time
 
 HOST = "127.0.0.1"
@@ -21,7 +21,7 @@ if __name__ == "__main__":
     memory.add_address_range(0x0087, 0x008B)
 
     # Set the joypad to be used, and then set it to hold right;
-    joypad = GBAndGBCJoypad()
+    joypad = SNESJoypad()
     controller_input.set_joypad(joypad)
     joypad.controls["Right"] = True
 

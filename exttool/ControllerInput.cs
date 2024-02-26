@@ -23,6 +23,7 @@ namespace BirdsEye {
             _joypad = newJoypad switch {
                 "NES" => new NESJoypad(),
                 "GB(C)" => new GBAndGBCJoypad(),
+                "SNES" => new SNESJoypad(),
                 _ => _joypad
             };
             return new Response("");
