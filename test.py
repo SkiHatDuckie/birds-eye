@@ -1,4 +1,5 @@
 import birdseyelib as bird
+from birdseyelib.joypad import NESJoypad
 import time
 
 HOST = "127.0.0.1"
@@ -19,6 +20,11 @@ if __name__ == "__main__":
     memory.add_address(0x0057)
     memory.add_address_range(0x0087, 0x008B)
 
+    # Set the joypad to be used, and then set it to hold right;
+    joypad = NESJoypad()
+    controller_input.set_joypad(joypad)
+    joypad.controls["Right"] = True
+
     close_attempt = False
     if not client.is_connected():
         print("Could not connect to external tool :[")
@@ -36,7 +42,7 @@ if __name__ == "__main__":
         while client.is_connected():
             # Queueing requests to the external tool.
             memory.request_memory()
-            controller_input.set_controller_input(right=True)
+            controller_input.set_controller_input(joypad)
             emulation.request_framecount()
             emulation.request_board_name()
 
