@@ -22,6 +22,7 @@ Welcome to the birds-eye documentation!
    source/api/controllerInput
    source/api/emulation
    source/api/externalTool
+   source/api/joypad
    source/api/memory
    source/api/socketClient
 

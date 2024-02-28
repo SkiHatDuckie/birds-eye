@@ -11,7 +11,6 @@ Here is a basic example of a working birds-eye python script::
         client = bird.Client(HOST, PORT)
 
         memory = bird.Memory(client)
-        controller_input = bird.ControllerInput(client)
         emulation = bird.Emulation(client)
         external_tool = bird.ExternalTool(client)
 
@@ -26,9 +25,6 @@ Here is a basic example of a working birds-eye python script::
         while client.is_connected():
             # Queueing requests to the external tool.
             memory.request_memory()
-            # Controller input requests will have no effect
-            # until the external tool is set to Commandeer Mode.
-            controller_input.set_controller_input(right=True)
             emulation.request_framecount()
 
             # Send requests, parse responses, and advance the emulator to the next frame.
