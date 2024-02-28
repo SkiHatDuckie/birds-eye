@@ -8,8 +8,12 @@ namespace BirdsEye {
             _log = log;
         }
 
-        public string GetFramecount(ApiContainer APIs) {
-            return APIs.Emulation.FrameCount().ToString();
+        public Response GetFramecount(ApiContainer APIs) {
+            return new Response(APIs.Emulation.FrameCount().ToString());
+        }
+
+        public Response GetBoardName(ApiContainer APIs) {
+            return new Response(APIs.Emulation.GetBoardName());
         }
     }
 }

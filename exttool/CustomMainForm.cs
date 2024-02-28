@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -22,6 +23,8 @@ namespace BirdsEye {
         private readonly ControllerInput _input;
         private readonly Emulation _emulation;
 
+        private readonly Dictionary<string, Func<string, Response>> _requestDictionary;
+
         private bool _commandeer = false;
 
         private Thread _commThread;
@@ -34,13 +37,25 @@ namespace BirdsEye {
         /// </summary>
         public CustomMainForm() {
             _log = new Logging(_config.logLevel);
-            _server = new SocketServer(_log, _config.host, _config.port);
+            _server = new SocketServer(_log, _config.host, _config.port, _config.socketTimeout,
+                _config.socketBufSize);
             _memory = new Memory(_log);
             _input = new ControllerInput(_log);
             _emulation = new Emulation(_log);
 
-            _commThread = new Thread(new ParameterizedThreadStart(_server.AcceptConnections));
-            _commThread.Start(_config);
+            _requestDictionary = new Dictionary<string, Func<string, Response>>() {
+                { "MEM_ADDRESS", (req) => _memory.AddAddressesFromString(req) },
+                { "MEM_READ", (req) => _memory.MemoryOnRequest(APIs) },
+                { "COM_GET", (req) => new Response(_commandeer.ToString()) },
+                { "COM_SET", (req) => ChangeCommMode(req == "True") },
+                { "INP_JOYPAD", (req) => _input.SetJoypad(req) },
+                { "INP_SET", (req) => _input.SetInputFromString(req) },
+                { "EMU_FRAME", (req) => _emulation.GetFramecount(APIs) },
+                { "EMU_BOARD", (req) => _emulation.GetBoardName(APIs) },
+            };
+
+            _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
+            _commThread.Start();
 
             _log.Write(0, "Initializing main form.");
             InitializeControls();
@@ -65,7 +80,7 @@ namespace BirdsEye {
                     _commThread.Join();
                 }
                 string? romName = APIs.Emulation.GetGameInfo()?.Name;
-                if (romName != null || romName != "Null") {
+                if (romName != null && romName != "Null") {
                     ProcessRequests();
                     if (_commandeer) {
                         _input.ExecuteInput(APIs);
@@ -83,25 +98,15 @@ namespace BirdsEye {
             try {
                 string response = "";
                 foreach (Request req in _server.ParseRequests()) {
-                    if (req.Tag == "MEMORY") {
-                        if (!string.IsNullOrEmpty(req.Data)) {
-                            _memory.AddAddressesFromString(req.Data);
-                        }
-                        _memory.ReadMemory(APIs);
-                        response += "MEMORY;" + _memory.FormatMemory() + "\n";
-                    } else if (req.Tag == "INPUT") {
-                        _input.SetInputFromString(req.Data);
-                        response += "INPUT;\n";
-                    } else if (req.Tag == "CLOSE") {
+                    if (req.Tag == "CLOSE") {
                         HandleDisconnect();
                         return;  // Short circuit to avoid sending an empty message.
-                    } else if (req.Tag == "FRAME") {
-                        response += "FRAME;" + _emulation.GetFramecount(APIs) + "\n";
-                    } else if (req.Tag == "COMMANDEER") {
-                        if (req.Data == "True") {
-                            EnableCommandeer();
-                        } else {
-                            DisableCommandeer();
+                    } else {
+                        try {
+                            response += req.Tag + ";" + _requestDictionary[req.Tag](req.Data)
+                                + "\n";
+                        } catch (KeyNotFoundException) {
+                            _log.Write(2, $"Unknown request tag: {req.Tag}.");
                         }
                     }
                 }
@@ -147,14 +152,11 @@ namespace BirdsEye {
         private void HandleDisconnect() {
             _server.CloseConnection();
             UpdateConnectionStatus(false);
-            DisableCommandeer();
-
+            ChangeCommMode(false);
             _memory.ClearAddresses();
-
             _lstError.Items.Add("WARNING: Connection with script has been stopped.");
-
-            _commThread = new Thread(new ParameterizedThreadStart(_server.AcceptConnections));
-            _commThread.Start(_config);
+            _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
+            _commThread.Start();
         }
 
         /// <summary>
@@ -174,22 +176,12 @@ namespace BirdsEye {
             return true;
         }
 
-        /// <summary>
-        /// Switches the communication mode to commandeer.
-        /// </summary>
-        private void EnableCommandeer() {
-            _log.Write(1, "Communication mode set to commandeer.");
-            _commandeer = true;
-            _lblCommMode.Text = "Communication Mode: Commandeer";
-        }
-
-        /// <summary>
-        /// Switches the communication mode to manual.
-        /// </summary>
-        private void DisableCommandeer() {
-            _log.Write(1, "Communication mode set to manual.");
-            _commandeer = false;
-            _lblCommMode.Text = "Communication Mode: Manual";
+        private Response ChangeCommMode(bool enable_commandeer) {
+            string modeName = enable_commandeer ? "Commandeer" : "Manual";
+            _log.Write(1, $"Communication mode set to {modeName.ToLower()}.");
+            _commandeer = enable_commandeer;
+            _lblCommMode.Text = $"Communication Mode: {modeName}";
+            return new Response("");
         }
 
         /// <summary>
@@ -199,11 +191,18 @@ namespace BirdsEye {
         /// </summary>
         private void ChangeCommModeButtonOnClick(object sender, EventArgs e) {
             if (CanCommandeer()) {
-                if (!_commandeer) {
-                    EnableCommandeer();
-                } else {
-                    DisableCommandeer();
-                }
+                ChangeCommMode(!_commandeer);
+            }
+        }
+
+        /// <summary>
+        /// Displays a message in `_lstError` if no client is already connected.
+        /// </summary>
+        private void DisconnectClientButtonOnClick(object sender, EventArgs e) {
+            if (!_server.IsConnected()) {
+                _lstError.Items.Add("ERROR: No script is connected.");
+            } else {
+                HandleDisconnect();
             }
         }
 

@@ -18,6 +18,7 @@ namespace BirdsEye {
             _config.port = Convert.ToInt32(_txtPort.Text);
             _config.logLevel = Convert.ToInt32(_txtLogLevel.Text);
             _config.socketTimeout = Convert.ToInt32(_txtTimeout.Text);
+            _config.socketBufSize = Convert.ToInt32(_txtBufSize.Text);
             _config.UpdateConfigs();
             _lblSubmit.Text = "Submitted!";
         }

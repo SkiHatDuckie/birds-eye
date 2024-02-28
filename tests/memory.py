@@ -8,9 +8,7 @@ if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
 
     memory = bird.Memory(client)
-    controller_input = bird.ControllerInput(client)
     emulation = bird.Emulation(client)
-    external_tool = bird.ExternalTool(client)
 
     client.connect()
     print("Connecting to server at {} on port {}.".format(HOST, PORT))
@@ -36,17 +34,15 @@ if __name__ == "__main__":
         while client.is_connected():
             # Queueing requests to the external tool.
             memory.request_memory()
-            controller_input.set_controller_input(right=True)
             emulation.request_framecount()
-            # if cnt == 0:
-            #     external_tool.set_commandeer(True)
+            emulation.request_board_name()
 
             # Send requests, parse responses, and advance the emulator to the next frame.
             client.advance_frame()
 
             print(
-                "Frame:" \
-                + str(emulation.get_framecount()) + ": " \
+                "Frame:" + str(emulation.get_framecount()) + ": " \
+                + "Board:" + emulation.get_board_name() + ": " \
                 + " ".join([
                     ":".join([str(addr), str(data)]) for addr, data in memory.get_memory().items()
                 ])

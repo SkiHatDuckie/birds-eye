@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 using BizHawk.Client.Common;
 
 namespace BirdsEye {
     public class ControllerInput {
-        private readonly bool[] _inputState = {false, false, false, false, false, false};
+        private Joypad _joypad = new NESJoypad();
         private readonly Logging _log;
 
         public ControllerInput(Logging log) {
@@ -13,28 +14,43 @@ namespace BirdsEye {
         }
 
         ///<summary>
+        /// Sets the joypad layout to be used when setting inputs. <br/>
+        /// Set to the NES joypad by default. <br/>
+        /// Returns nothing as a response.
+        ///</summary>
+        public Response SetJoypad(string newJoypad) {
+            _log.Write(1, $"Changing joypad layout to {newJoypad}.");
+            _joypad = newJoypad switch {
+                "NES" => new NESJoypad(),
+                "GB(C)" => new GBAndGBCJoypad(),
+                "SNES" => new SNESJoypad(),
+                _ => _joypad
+            };
+            return new Response("");
+        }
+
+        ///<summary>
         /// Execute the current input state in the emulator.
         ///</summary>
         public void ExecuteInput(ApiContainer APIs) {
-            APIs.Joypad.Set(new Dictionary<string, bool>() {
-                {"A", _inputState[0]},
-                {"B", _inputState[1]},
-                {"Up", _inputState[2]},
-                {"Down", _inputState[3]},
-                {"Right", _inputState[4]},
-                {"Left", _inputState[5]}
-            }, 1);
+            APIs.Joypad.Set((IReadOnlyDictionary<string, bool>) _joypad.Controls!, 1);
         }
 
         ///<summary>
         /// Set the controller input from a string containing the state of different buttons
-        /// to be executed when `ExecuteInput` is called.
+        /// to be executed when `ExecuteInput` is called. <br/>
+        /// Be warned! This assumes that the joypad layout matches the currently
+        /// emulated system. <br/>
+        /// Returns nothing as a response.
         ///</summary>
-        public void SetInputFromString(string str) {
+        public Response SetInputFromString(string str) {
             string[] newState = str.Trim(';').Split(';');
-            for (int i = 0; i < 6; i++) {
-                _inputState[i] = Convert.ToBoolean(newState[i]);
+            string key;
+            for (int i = 0; i < _joypad.Controls!.Count; i++) {
+                key = _joypad.Controls.ElementAt(i).Key;
+                _joypad.Controls[key] = Convert.ToBoolean(newState[i]);
             }
+            return new Response("");
         }
     }
 }

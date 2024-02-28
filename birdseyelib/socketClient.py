@@ -18,7 +18,7 @@ class Client:
     def __init__(self, ip, port):
         self.ip = ip
         self.port = port
-        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        self.client = None  # Initialized in Client.connect
         self.connection_status = -1
         self.payload = ""
         self.latest_responses = []
@@ -27,6 +27,7 @@ class Client:
         """(Blocking) Attempt to connect to the external tool.
 
         Call `Client.is_connected()` to see if the attempt was successful."""
+        self.client = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.connection_status = self.client.connect_ex((self.ip, self.port))
 
     def close(self):
@@ -67,9 +68,22 @@ class Client:
         tool.
 
         :precondition: client is connected to a socket."""
+        message = ""
+        bufsize = 2048
         try:
-            return self.client.recv(2048).decode()
-        except:
+            message = self.client.recv(bufsize).decode()
+            if (len(message) >= bufsize):  # Full message is possibly larger than `bufsize`
+                self.client.setblocking(False)
+                try:
+                    temp = self.client.recv(bufsize).decode()
+                    while (True):
+                        message += temp
+                        temp = self.client.recv(bufsize).decode()
+                except:  # `socket.recv` will raise an exception if empty.
+                    pass
+                self.client.setblocking(True)
+            return message
+        except InterruptedError:
             self.close()
 
     def _parse_responses(self):

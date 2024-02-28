@@ -9,6 +9,7 @@ namespace BirdsEye {
         public int port = 8080;
         public int logLevel = 1;
         public int socketTimeout = 10000;
+        public int socketBufSize = 2048;
 
         public Config() {
             if (!File.Exists("birdconfig.txt")) {
@@ -23,10 +24,13 @@ namespace BirdsEye {
         /// </summary>
         private byte[] FormatConfigFields() {
             return new UTF8Encoding(true).GetBytes(
-                "host=" + host + "\n" +
-                "port=" + port.ToString() + "\n" +
-                "logLevel=" + logLevel.ToString() + "\n" +
-                "socketTimeout=" + socketTimeout.ToString()
+                string.Join("\n", new string[] { 
+                    "host=" + host,
+                    "port=" + port.ToString(),
+                    "logLevel=" + logLevel.ToString(),
+                    "socketTimeout=" + socketTimeout.ToString(),
+                    "socketBufSize=" + socketBufSize.ToString(),
+                })
             );
         }
 
@@ -49,10 +53,29 @@ namespace BirdsEye {
             UTF8Encoding data = new(true);
             file.Read(bytes, 0, bytes.Length);
             string[] configs = data.GetString(bytes).Split('\n');
-            host = configs[0].Substring(configs[0].IndexOf('=') + 1);
-            port = Convert.ToInt32(configs[1].Substring(configs[1].IndexOf('=') + 1));
-            logLevel = Convert.ToInt32(configs[2].Substring(configs[2].IndexOf('=') + 1));
-            socketTimeout = Convert.ToInt32(configs[3].Substring(configs[3].IndexOf('=') + 1));
+            foreach (string line in configs) {
+                if (line.IndexOf('=') != -1) {
+                    string config = line.Substring(0, line.IndexOf('='));
+                    string value = line.Substring(line.IndexOf('=') + 1);
+                    switch (config) {
+                        case "host":
+                            host = value;
+                            break;
+                        case "port":
+                            port = Convert.ToInt32(value);
+                            break;
+                        case "logLevel":
+                            logLevel = Convert.ToInt32(value);
+                            break;
+                        case "socketTimeout":
+                            socketTimeout = Convert.ToInt32(value);
+                            break;
+                        case "socketBufSize":
+                            socketBufSize = Convert.ToInt32(value);
+                            break;
+                    };
+                }
+            }
         }
 
         /// <summary>
