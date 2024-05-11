@@ -3,4 +3,5 @@ exttool/bin
 exttool/obj
 BizHawk
 docs/_?*
+!docs/_static
 **/__pycache__
