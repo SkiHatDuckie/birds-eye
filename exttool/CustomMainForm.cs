@@ -44,14 +44,15 @@ namespace BirdsEye {
             _emulation = new Emulation(_log);
 
             _requestDictionary = new Dictionary<string, Func<string, Response>>() {
-                { "MEM_ADDRESS", (req) => _memory.AddAddressesFromString(req) },
-                { "MEM_READ", (req) => _memory.MemoryOnRequest(APIs) },
                 { "COM_GET", (req) => new Response(_commandeer.ToString()) },
                 { "COM_SET", (req) => ChangeCommMode(req == "True") },
+                { "EMU_BOARD", (req) => _emulation.GetBoardName(APIs) },
+                { "EMU_DISPLAY", (req) => _emulation.GetDisplayType(APIs) },
+                { "EMU_FRAME", (req) => _emulation.GetFramecount(APIs) },
                 { "INP_JOYPAD", (req) => _input.SetJoypad(req) },
                 { "INP_SET", (req) => _input.SetInputFromString(req) },
-                { "EMU_FRAME", (req) => _emulation.GetFramecount(APIs) },
-                { "EMU_BOARD", (req) => _emulation.GetBoardName(APIs) },
+                { "MEM_ADDRESS", (req) => _memory.AddAddressesFromString(req) },
+                { "MEM_READ", (req) => _memory.MemoryOnRequest(APIs) },
             };
 
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));

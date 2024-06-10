@@ -36,6 +36,7 @@ if __name__ == "__main__":
             memory.request_memory()
             emulation.request_framecount()
             emulation.request_board_name()
+            emulation.request_display_type()
 
             # Send requests, parse responses, and advance the emulator to the next frame.
             client.advance_frame()
@@ -43,6 +44,7 @@ if __name__ == "__main__":
             print(
                 "Frame:" + str(emulation.get_framecount()) + ": " \
                 + "Board:" + emulation.get_board_name() + ": " \
+                + "Display Type:" + emulation.get_display_type() + ": " \
                 + " ".join([
                     ":".join([str(addr), str(data)]) for addr, data in memory.get_memory().items()
                 ])
