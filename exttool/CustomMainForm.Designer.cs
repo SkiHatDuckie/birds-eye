@@ -11,6 +11,9 @@ namespace BirdsEye {
         public GroupBoxEx _grpRomInfo;
         public FlowLayoutPanel _flpRomInfo;
         public Label _lblRomName;
+        public Label _lblRomStatus;
+        public Label _lblBoardName;
+        public Label _lblDisplayType;
 
         public GroupBoxEx _grpCommunications;
         public FlowLayoutPanel _flpCommunications;
@@ -57,6 +60,15 @@ namespace BirdsEye {
             _lblRomName = new Label {
                 AutoSize = true,
             };
+            _lblRomStatus = new Label {
+                AutoSize = true,
+            };
+            _lblBoardName = new Label {
+                AutoSize = true,
+            };
+            _lblDisplayType = new Label {
+                AutoSize = true,
+            };
             _grpCommunications = new GroupBoxEx {
                 Text = "Communications",
                 Size = new Size(280, 160),
@@ -89,6 +101,9 @@ namespace BirdsEye {
 
             _mainFormMenu.Items.Add(_optionSubMenu);
             _flpRomInfo.Controls.Add(_lblRomName);
+            _flpRomInfo.Controls.Add(_lblRomStatus);
+            _flpRomInfo.Controls.Add(_lblBoardName);
+            _flpRomInfo.Controls.Add(_lblDisplayType);
             _grpRomInfo.Controls.Add(_flpRomInfo);
             _flpCommunications.Controls.Add(_lblCommMode);
             _flpCommunications.Controls.Add(_btnChangeCommMode);

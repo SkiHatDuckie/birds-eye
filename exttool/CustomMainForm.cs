@@ -5,6 +5,7 @@ using System.Windows.Forms;
 
 using BizHawk.Client.Common;
 using BizHawk.Client.EmuHawk;
+using BizHawk.Emulation.Common;
 
 namespace BirdsEye {
     [ExternalTool("BirdsEye")]
@@ -123,11 +124,22 @@ namespace BirdsEye {
         /// Change the text of `_lblRomName` to display the current rom.
         /// </summary>
         private void DisplayLoadedRom() {
-            string? romName = APIs.Emulation.GetGameInfo()?.Name;
-            if (romName != null || romName != "Null") {
-                _lblRomName.Text = $"Currently loaded: {romName}";
+            IGameInfo? gameInfo = APIs.Emulation.GetGameInfo();
+            string boardName = APIs.Emulation.GetBoardName();
+            string displayType = APIs.Emulation.GetDisplayType();
+            _lblRomName.Text = $"ROM Name: {gameInfo?.Name ?? "N/A"}";
+            if (gameInfo?.Name == null) {
+                _lstError.Items.Add("WARNING: Unable to obtain ROM info from API.");
+                _log.Write(2, "Unable to obtain ROM info from API.");
+            }
+            if (gameInfo?.Name == null || gameInfo?.Name == "Null") {
+                _lblRomStatus.Text = "";
+                _lblBoardName.Text = "";
+                _lblDisplayType.Text = "";
             } else {
-                _lblRomName.Text = "Currently loaded: Nothing";
+                _lblRomStatus.Text = $"ROM Status: {gameInfo?.Status}";
+                _lblBoardName.Text = $"Board Name: {(boardName != "" ? boardName : "N/A")}";
+                _lblDisplayType.Text = $"Display Type: {(displayType != "" ? displayType : "N/A")}";
             }
         }
 
