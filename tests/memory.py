@@ -35,14 +35,12 @@ if __name__ == "__main__":
             # Queueing requests to the external tool.
             memory.request_memory()
             emulation.request_framecount()
-            emulation.request_board_name()
 
             # Send requests, parse responses, and advance the emulator to the next frame.
             client.advance_frame()
 
             print(
                 "Frame:" + str(emulation.get_framecount()) + ": " \
-                + "Board:" + emulation.get_board_name() + ": " \
                 + " ".join([
                     ":".join([str(addr), str(data)]) for addr, data in memory.get_memory().items()
                 ])

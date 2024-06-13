@@ -15,5 +15,9 @@ namespace BirdsEye {
         public Response GetBoardName(ApiContainer APIs) {
             return new Response(APIs.Emulation.GetBoardName());
         }
+
+        public Response GetDisplayType(ApiContainer APIs) {
+            return new Response(APIs.Emulation.GetDisplayType());
+        }
     }
 }

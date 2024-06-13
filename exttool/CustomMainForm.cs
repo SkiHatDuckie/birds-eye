@@ -5,6 +5,7 @@ using System.Windows.Forms;
 
 using BizHawk.Client.Common;
 using BizHawk.Client.EmuHawk;
+using BizHawk.Emulation.Common;
 
 namespace BirdsEye {
     [ExternalTool("BirdsEye")]
@@ -44,14 +45,15 @@ namespace BirdsEye {
             _emulation = new Emulation(_log);
 
             _requestDictionary = new Dictionary<string, Func<string, Response>>() {
-                { "MEM_ADDRESS", (req) => _memory.AddAddressesFromString(req) },
-                { "MEM_READ", (req) => _memory.MemoryOnRequest(APIs) },
                 { "COM_GET", (req) => new Response(_commandeer.ToString()) },
                 { "COM_SET", (req) => ChangeCommMode(req == "True") },
+                { "EMU_BOARD", (req) => _emulation.GetBoardName(APIs) },
+                { "EMU_DISPLAY", (req) => _emulation.GetDisplayType(APIs) },
+                { "EMU_FRAME", (req) => _emulation.GetFramecount(APIs) },
                 { "INP_JOYPAD", (req) => _input.SetJoypad(req) },
                 { "INP_SET", (req) => _input.SetInputFromString(req) },
-                { "EMU_FRAME", (req) => _emulation.GetFramecount(APIs) },
-                { "EMU_BOARD", (req) => _emulation.GetBoardName(APIs) },
+                { "MEM_ADDRESS", (req) => _memory.AddAddressesFromString(req) },
+                { "MEM_READ", (req) => _memory.MemoryOnRequest(APIs) },
             };
 
             _commThread = new Thread(new ThreadStart(_server.AcceptConnections));
@@ -122,11 +124,22 @@ namespace BirdsEye {
         /// Change the text of `_lblRomName` to display the current rom.
         /// </summary>
         private void DisplayLoadedRom() {
-            string? romName = APIs.Emulation.GetGameInfo()?.Name;
-            if (romName != null || romName != "Null") {
-                _lblRomName.Text = $"Currently loaded: {romName}";
+            IGameInfo? gameInfo = APIs.Emulation.GetGameInfo();
+            string boardName = APIs.Emulation.GetBoardName();
+            string displayType = APIs.Emulation.GetDisplayType();
+            _lblRomName.Text = $"ROM Name: {gameInfo?.Name ?? "N/A"}";
+            if (gameInfo?.Name == null) {
+                _lstError.Items.Add("WARNING: Unable to obtain ROM info from API.");
+                _log.Write(2, "Unable to obtain ROM info from API.");
+            }
+            if (gameInfo?.Name == null || gameInfo?.Name == "Null") {
+                _lblRomStatus.Text = "";
+                _lblBoardName.Text = "";
+                _lblDisplayType.Text = "";
             } else {
-                _lblRomName.Text = "Currently loaded: Nothing";
+                _lblRomStatus.Text = $"ROM Status: {gameInfo?.Status}";
+                _lblBoardName.Text = $"Board Name: {(boardName != "" ? boardName : "N/A")}";
+                _lblDisplayType.Text = $"Display Type: {(displayType != "" ? displayType : "N/A")}";
             }
         }
 
