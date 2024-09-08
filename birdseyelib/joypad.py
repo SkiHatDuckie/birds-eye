@@ -40,3 +40,20 @@ class SNESJoypad(Joypad):
             "A": False, "B": False, "L": False, "R": False, "X": False, "Y": False, "Up": False,
             "Down": False, "Right": False, "Left": False, "Select": False, "Start": False,
         }
+
+
+class NDSJoypad(Joypad):
+    """Controller mapping for the NDS
+    
+    The \"Power\" button is not implemented for the time being."""
+    def __init__(self):
+        super().__init__()
+        self._name = "NDS"
+        self.controls = {
+            "A": False, "B": False, "L": False, "R": False, "X": False, "Y": False, "Up": False,
+            "Down": False, "Right": False, "Left": False, "Select": False, "Start": False,
+            "LidClose": False, "LidOpen": False, "Touch": False,
+        }
+        self.analog_controls = {
+            "Mic Volume": "0", "GBA Light Sensor": "0",  "Touch X": "142", "Touch Y": "0",
+        }

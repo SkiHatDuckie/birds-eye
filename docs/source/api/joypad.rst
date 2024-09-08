@@ -14,3 +14,6 @@ joypad
 
 .. autoclass:: birdseyelib.SNESJoypad
     :members:
+
+.. autoclass:: birdseyelib.NDSJoypad
+    :members:

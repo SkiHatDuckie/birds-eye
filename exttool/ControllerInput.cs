@@ -24,6 +24,7 @@ namespace BirdsEye {
                 "NES" => new NESJoypad(),
                 "GB(C)" => new GBAndGBCJoypad(),
                 "SNES" => new SNESJoypad(),
+                "NDS" => new NDSJoypad(),
                 _ => _joypad
             };
             return new Response("");
@@ -34,6 +35,9 @@ namespace BirdsEye {
         ///</summary>
         public void ExecuteInput(ApiContainer APIs) {
             APIs.Joypad.Set((IReadOnlyDictionary<string, bool>) _joypad.Controls!, 1);
+            if (_joypad.ControlsAnalog != null) {
+                APIs.Joypad.SetAnalog((IReadOnlyDictionary<string, int?>) _joypad.ControlsAnalog, 1);
+            }
         }
 
         ///<summary>
@@ -49,6 +53,16 @@ namespace BirdsEye {
             for (int i = 0; i < _joypad.Controls!.Count; i++) {
                 key = _joypad.Controls.ElementAt(i).Key;
                 _joypad.Controls[key] = Convert.ToBoolean(newState[i]);
+            }
+            return new Response("");
+        }
+
+        public Response SetAnalogInputFromString(string str) {
+            string[] newState = str.Trim(';').Split(';');
+            string key;
+            for (int i = 0; i < _joypad.ControlsAnalog!.Count; i++) {
+                key = _joypad.ControlsAnalog.ElementAt(i).Key;
+                _joypad.ControlsAnalog[key] = Convert.ToInt32(newState[i]);
             }
             return new Response("");
         }
