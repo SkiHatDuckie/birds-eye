@@ -52,6 +52,7 @@ namespace BirdsEye {
                 { "EMU_FRAME", (req) => _emulation.GetFramecount(APIs) },
                 { "INP_JOYPAD", (req) => _input.SetJoypad(req) },
                 { "INP_SET", (req) => _input.SetInputFromString(req) },
+                { "INP_SET_ANALOG", (req) => _input.SetAnalogInputFromString(req) },
                 { "MEM_ADDRESS", (req) => _memory.AddAddressesFromString(req) },
                 { "MEM_READ", (req) => _memory.MemoryOnRequest(APIs) },
             };
