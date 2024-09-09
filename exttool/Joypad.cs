@@ -4,6 +4,7 @@ namespace BirdsEye {
     public class Joypad {
         public IDictionary<string, bool>? Controls;
         public IDictionary<string, int?>? ControlsAnalog;
+        public int? DefaultController;
     }
 
     public class NESJoypad : Joypad {
@@ -12,6 +13,7 @@ namespace BirdsEye {
                 {"A", false}, {"B", false}, {"Up", false}, {"Down", false}, {"Right", false},
                 {"Left", false}, {"Select", false}, {"Start", false},
             };
+            DefaultController = 1;
         }
     }
 
@@ -21,6 +23,7 @@ namespace BirdsEye {
                 {"A", false}, {"B", false}, {"Up", false}, {"Down", false}, {"Right", false},
                 {"Left", false}, {"Select", false}, {"Start", false},
             };
+            DefaultController = 1;
         }
     }
 
@@ -31,6 +34,7 @@ namespace BirdsEye {
                 {"Up", false}, {"Down", false}, {"Right", false}, {"Left", false},
                 {"Select", false}, {"Start", false},
             };
+            DefaultController = 1;
         }
     }
 
@@ -45,6 +49,7 @@ namespace BirdsEye {
             ControlsAnalog = new Dictionary<string, int?>() {
                 {"Mic Volume", 0}, {"GBA Light Sensor", 0}, {"Touch X", 142}, {"Touch Y", 0},
             };
+            DefaultController = null;
         }
     }
 }
