@@ -34,9 +34,9 @@ namespace BirdsEye {
         /// Execute the current input state in the emulator.
         ///</summary>
         public void ExecuteInput(ApiContainer APIs) {
-            APIs.Joypad.Set((IReadOnlyDictionary<string, bool>) _joypad.Controls!, 1);
+            APIs.Joypad.Set((IReadOnlyDictionary<string, bool>) _joypad.Controls!, _joypad.DefaultController);
             if (_joypad.ControlsAnalog != null) {
-                APIs.Joypad.SetAnalog((IReadOnlyDictionary<string, int?>) _joypad.ControlsAnalog, 1);
+                APIs.Joypad.SetAnalog((IReadOnlyDictionary<string, int?>) _joypad.ControlsAnalog, _joypad.DefaultController);
             }
         }
 
