@@ -1,0 +1,39 @@
+name: Build external tool
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  build:
+    name: Build external tool for BizHawk ${{ matrix.bizhawk-version }}
+    strategy:
+      matrix:
+        bizhawk-version: [2.9, 2.9.1]
+    runs-on: windows-latest
+    steps:
+      - name: Checkout birds-eye repository
+        uses: actions/checkout@v4
+        with:
+          path: birds-eye
+
+      - name: Download BizHawk ${{ matrix.bizhawk-version }}
+        run: |
+          curl -L https://github.com/TASEmulators/BizHawk/releases/download/${{ matrix.bizhawk-version }}/BizHawk-${{ matrix.bizhawk-version }}-win-x64.zip -o BizHawk-${{ matrix.bizhawk-version }}-win-x64.zip
+          unzip BizHawk-${{ matrix.bizhawk-version }}-win-x64.zip -d birds-eye/BizHawk
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v2
+
+      - name: Build project
+        run: |
+          msbuild -t:restore BirdsEye.csproj
+          msbuild BirdsEye.csproj
+        working-directory: birds-eye/exttool
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: BizHawk_${{ matrix.bizhawk-version }}_BirdsEye.dll
+          path: birds-eye/BizHawk/ExternalTools/BirdsEye.dll
