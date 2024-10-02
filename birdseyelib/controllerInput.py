@@ -25,8 +25,10 @@ class ControllerInput:
         controller_input = ";".join(
             [bool_to_string[joypad.controls[button]] for button in joypad.controls.keys()]
         )
-        controller_analog_input = ";".join(
-            [str(joypad.analog_controls[analog_control]) for analog_control in joypad.analog_controls.keys()]
-        )
         self.client._queue_request("INP_SET;" + controller_input + "\n")
-        self.client._queue_request("INP_SET_ANALOG;" + controller_analog_input + "\n")
+        if hasattr(joypad, "analog_controls"):
+            controller_analog_input = ";".join(
+                [str(joypad.analog_controls[analog_control])
+                 for analog_control in joypad.analog_controls.keys()]
+            )
+            self.client._queue_request("INP_SET_ANALOG;" + controller_analog_input + "\n")
