@@ -3,5 +3,5 @@
 set -e
 cd exttool
 dotnet build
-../BizHawk/EmuHawkMono.sh --mono-no-redirect --open-ext-tool-dll=BirdsEye
+../BizHawk/EmuHawkMono.sh --mono-no-redirect
 cd ..
