@@ -1,35 +1,38 @@
-class Emulation:
-    """Class containing various functions for controlling emulation in BizHawk."""
-    def __init__(self, client) -> None:
-        self.client = client
+from birdseyelib.request import Request
 
-    def request_framecount(self):
-        """Requests for the current framecount from the external tool."""
-        self.client._queue_request("EMU_FRAME;\n")
-    
-    def request_board_name(self):
-        """Requests for the board name of the loaded ROM."""
-        self.client._queue_request("EMU_BOARD;\n")
-    
-    def request_display_type(self):
-        """Requests for the display type that the emulator is currently running on."""
-        self.client._queue_request("EMU_DISPLAY;\n")
 
-    def get_framecount(self) -> int:
+class Framerate(Request):
+    """Requests for the current framecount from the external tool."""
+    def __init__(self, client):
+        super().__init__("EMU_FRAME", client)
+    
+    def receive(self) -> int:
         """Returns the current framecount from the emulator, or `-1`, if no
         data has been received yet."""
-        data = self.client._get_latest_response_data("EMU_FRAME")
+        data = self.client._get_latest_response_data(self.tag)
         return int(data) if data else -1
-    
-    def get_board_name(self) -> str:
+
+
+class BoardName(Request):
+    """Requests for the board name of the loaded ROM."""
+    def __init__(self, client):
+        super().__init__("EMU_BOARD", client)
+
+    def receive(self) -> str:
         """Returns the board name of the loaded ROM, or `""`, if not available."""
-        data = self.client._get_latest_response_data("EMU_BOARD")
+        data = self.client._get_latest_response_data(self.tag)
         return data if data else ""
 
-    def get_display_type(self) -> str:
+
+class DisplayType(Request):
+    """Requests for the display type that the emulator is currently running on."""
+    def __init__(self, client):
+        super().__init__("EMU_DISPLAY", client)
+
+    def receive(self) -> str:
         """Returns the display type (`"PAL"` or `"NTSC"`) that the emulator is currently running
         on.
 
         Returns `""`, if not avaiable."""
-        data = self.client._get_latest_response_data("EMU_DISPLAY")
+        data = self.client._get_latest_response_data(self.tag)
         return data if data else ""
