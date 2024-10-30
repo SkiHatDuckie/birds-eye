@@ -1,4 +1,4 @@
-from birdseyelib.request import Request
+from request import Request
 
 
 class Framerate(Request):
