@@ -15,7 +15,7 @@ if __name__ == "__main__":
     if not client.is_connected():
         print("Could not connect to external tool :[")
         exit(1)
-    
+
     # NOTE: Certain data will not be available depending on the system being emulated.
     requests.queue_all()
 
