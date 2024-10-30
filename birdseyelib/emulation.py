@@ -1,7 +1,7 @@
 from request import Request
 
 
-class Framerate(Request):
+class Framecount(Request):
     """Requests for the current framecount from the external tool."""
     def __init__(self, client):
         super().__init__("EMU_FRAME", client)
