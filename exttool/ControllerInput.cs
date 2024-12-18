@@ -50,19 +50,14 @@ namespace BirdsEye {
         public Response SetInputFromString(string str) {
             string[] newState = str.Trim(';').Split(';');
             string key;
-            for (int i = 0; i < _joypad.Controls!.Count; i++) {
-                key = _joypad.Controls.ElementAt(i).Key;
-                _joypad.Controls[key] = Convert.ToBoolean(newState[i]);
-            }
-            return new Response("");
-        }
-
-        public Response SetAnalogInputFromString(string str) {
-            string[] newState = str.Trim(';').Split(';');
-            string key;
-            for (int i = 0; i < _joypad.ControlsAnalog!.Count; i++) {
-                key = _joypad.ControlsAnalog.ElementAt(i).Key;
-                _joypad.ControlsAnalog[key] = Convert.ToInt32(newState[i]);
+            for (int i = 0; i < newState.Count; i++) {
+                if (i <= _joypad.Controls!.Count) {
+                    key = _joypad.Controls.ElementAt(i).Key;
+                    _joypad.Controls[key] = Convert.ToBoolean(newState[i]);
+                } else {
+                    key = _joypad.ControlsAnalog.ElementAt(i).Key;
+                    _joypad.ControlsAnalog[key] = Convert.ToInt32(newState[i]);
+                }
             }
             return new Response("");
         }
