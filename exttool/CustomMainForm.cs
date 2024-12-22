@@ -45,8 +45,7 @@ namespace BirdsEye {
             _emulation = new Emulation(_log);
 
             _requestDictionary = new Dictionary<string, Func<string, Response>>() {
-                { "COM_GET", (req) => new Response(_commandeer.ToString()) },
-                { "COM_SET", (req) => ChangeCommMode(req == "True") },
+                { "COM", (req) => HandleCommandeerRequest(req) },
                 { "EMU_BOARD", (req) => _emulation.GetBoardName(APIs) },
                 { "EMU_DISPLAY", (req) => _emulation.GetDisplayType(APIs) },
                 { "EMU_FRAME", (req) => _emulation.GetFramecount(APIs) },
@@ -195,6 +194,20 @@ namespace BirdsEye {
             _commandeer = enable_commandeer;
             _lblCommMode.Text = $"Communication Mode: {modeName}";
             return new Response("");
+        }
+
+        /// <summary>
+        /// Handles the `COM` request based on the data sent.<br/>
+        /// - No additional data beyond the tag: Get commandeer<br/>
+        /// - A True/False value was sent: Set commandeer to value
+        /// </summary>
+        private Response HandleCommandeerRequest(string req) {
+            string[] req = req.Trim(';').Split(';');
+            if (req.Count == 1) {
+                return new Response(_commandeer.ToString());
+            } else {
+                return ChangeCommMode(req[1] == "True");
+            }
         }
 
         /// <summary>

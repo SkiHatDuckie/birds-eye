@@ -7,7 +7,7 @@ PORT = 8080
 if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
     framecount = bird.emulation.Framecount(client)
-    commandeer = bird.externalTool.GetCommandeer(client)
+    commandeer = bird.externalTool.Commandeer(client)
     requests = bird.RequestBatch((framecount, commandeer))
 
     client.connect()
@@ -22,8 +22,7 @@ if __name__ == "__main__":
     controller_input.queue()
 
     # Set commandeer mode to true from the script.
-    set_commandeer = bird.externalTool.SetCommandeer(client, True)
-    set_commandeer.queue()
+    commandeer.queue(enabled=True)
 
     close_attempt = False
     if not client.is_connected():
