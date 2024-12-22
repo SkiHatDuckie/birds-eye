@@ -6,18 +6,19 @@ PORT = 8080
 
 if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
-
-    controller_input = bird.ControllerInput(client)
-    emulation = bird.Emulation(client)
+    framecount = bird.emulation.Framecount(client)
     external_tool = bird.ExternalTool(client)
+    requests = bird.RequestBatch((framecount, external_tool))
 
     client.connect()
     print("Connecting to server at {} on port {}.".format(HOST, PORT))
 
-    # Set the joypad to be used, and then set it to hold right;
+    # Set the joypad to use, and set it to hold right
     joypad = bird.SNESJoypad()
-    controller_input.set_joypad(joypad)
-    joypad.controls["Right"] = True
+    joypad_config = bird.controllerInput.JoypadConfig(client, joypad)
+    controller_input = bird.controllerInput.ControllerInputs(client, joypad)
+    controller_input.joypad.controls["Right"] = True
+    controller_input.queue()
 
     close_attempt = False
     if not client.is_connected():
@@ -34,9 +35,7 @@ if __name__ == "__main__":
             client.connect()
 
         while client.is_connected():
-            # Queueing requests to the external tool.
-            controller_input.set_controller_input(joypad)
-            emulation.request_framecount()
+            requests.queue_all()
 
             external_tool.request_commandeer()
             if cnt == 0:
@@ -46,7 +45,7 @@ if __name__ == "__main__":
             client.advance_frame()
 
             print(
-                "Frame:" + str(emulation.get_framecount()) + ": " \
+                "Frame:" + str(framecount.receive()) + ": " \
                 + "Commandeer: " + str(external_tool.get_commandeer()) + ": " \
                 + " ".join([
                     ":".join([button, str(state)]) for button, state in joypad.controls.items()
