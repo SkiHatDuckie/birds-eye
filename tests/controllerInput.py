@@ -7,8 +7,8 @@ PORT = 8080
 if __name__ == "__main__":
     client = bird.Client(HOST, PORT)
     framecount = bird.emulation.Framecount(client)
-    external_tool = bird.ExternalTool(client)
-    requests = bird.RequestBatch((framecount, external_tool))
+    commandeer = bird.externalTool.GetCommandeer(client)
+    requests = bird.RequestBatch((framecount, commandeer))
 
     client.connect()
     print("Connecting to server at {} on port {}.".format(HOST, PORT))
@@ -18,7 +18,12 @@ if __name__ == "__main__":
     joypad_config = bird.controllerInput.JoypadConfig(client, joypad)
     controller_input = bird.controllerInput.ControllerInputs(client, joypad)
     controller_input.joypad.controls["Right"] = True
+    joypad_config.queue()
     controller_input.queue()
+
+    # Set commandeer mode to true from the script.
+    set_commandeer = bird.externalTool.SetCommandeer(client, True)
+    set_commandeer.queue()
 
     close_attempt = False
     if not client.is_connected():
@@ -37,18 +42,15 @@ if __name__ == "__main__":
         while client.is_connected():
             requests.queue_all()
 
-            external_tool.request_commandeer()
-            if cnt == 0:
-                external_tool.set_commandeer(True)
-
             # Send requests, parse responses, and advance the emulator to the next frame.
             client.advance_frame()
 
             print(
                 "Frame:" + str(framecount.receive()) + ": " \
-                + "Commandeer: " + str(external_tool.get_commandeer()) + ": " \
+                + "Commandeer: " + str(commandeer.receive()) + ": " \
                 + " ".join([
-                    ":".join([button, str(state)]) for button, state in joypad.controls.items()
+                    ":".join([button, str(state)])
+                    for button, state in controller_input.joypad.controls.items()
                 ])
             )
 

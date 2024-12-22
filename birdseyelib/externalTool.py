@@ -1,21 +1,24 @@
-class ExternalTool:
-    """Class containing various functions for controlling the external tool."""
-    def __init__(self, client) -> None:
-        self.client = client
+from request import Request
 
-    def request_commandeer(self):
-        """Requests for the current status on commandeer."""
-        self.client._queue_request("COM_GET;\n")
 
-    def get_commandeer(self) -> bool:
-        """Returns the current status on commandeer: `True` if enabled, `False` otherwise."""
-        data = self.client._get_latest_response_data("COM_GET")
-        return eval(data)
+class GetCommandeer(Request):
+    """Returns the current status on commandeer: `True` if enabled, `False` otherwise."""
+    def __init__(self, client):
+        super().__init__("COM_GET", client)
+    
+    def receive(self):
+        return eval(self.client._get_latest_response_data(self.tag))
 
-    def set_commandeer(self, enabled):
-        """Sets the communication mode of the external tool to either manual or commandeer.
 
-        :param enabled: Determines whether a request to enable commandeer or disable it should be sent. \
-        `True` = enable commandeer, `False` = disable.
-        :type enabled: bool"""
-        self.client._queue_request("COM_SET;" + str(enabled) + "\n")
+class SetCommandeer(Request):
+    """Sets the communication mode of the external tool to either manual or commandeer.
+
+    :param enabled: Determines whether a request to enable commandeer or disable it should be
+    sent. `True` = enable commandeer, `False` = disable.
+    :type enabled: bool"""
+    def __init__(self, client, enabled):
+        super().__init__("COM_SET", client)
+        self.enabled = enabled
+
+    def queue(self):
+        self.client._queue_request(self.tag + ";" + str(self.enabled) + "\n")
