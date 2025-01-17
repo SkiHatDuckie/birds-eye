@@ -1,4 +1,4 @@
-from request import Request
+from birdseyelib import Request
 
 
 class Commandeer(Request):

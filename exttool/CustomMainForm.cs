@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Windows.Forms;
 
@@ -202,11 +203,15 @@ namespace BirdsEye {
         /// - A True/False value was sent: Set commandeer to value
         /// </summary>
         private Response HandleCommandeerRequest(string req) {
-            string[] req = req.Trim(';').Split(';');
-            if (req.Count == 1) {
+            string[] req_args = req
+                .Trim(';')
+                .Split(';')
+                .Where(arg => !string.IsNullOrEmpty(arg))
+                .ToArray();
+            if (req_args.Length == 0) {
                 return new Response(_commandeer.ToString());
             } else {
-                return ChangeCommMode(req[1] == "True");
+                return ChangeCommMode(req_args[0] == "True");
             }
         }
 

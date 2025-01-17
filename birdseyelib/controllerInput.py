@@ -1,4 +1,4 @@
-from request import Request
+from birdseyelib import Request
 
 
 class JoypadConfig(Request):
@@ -14,7 +14,7 @@ class JoypadConfig(Request):
         self.joypad = joypad
 
     def queue(self):
-        self.client._queue_request(self.tag + ";" + self.joypad + "\n")
+        self.client._queue_request(self.tag + ";" + self.joypad._name + "\n")
 
 class ControllerInputs(Request):
     """Sets the controller inputs to be executed in the emulator.
@@ -39,4 +39,5 @@ class ControllerInputs(Request):
                 for analog_control in self.joypad.analog_controls.keys()
             ]
 
+        controller_input = ";".join(controller_input)
         self.client._queue_request(self.tag + ";" + controller_input + "\n")
