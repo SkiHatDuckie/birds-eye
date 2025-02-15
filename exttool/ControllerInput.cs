@@ -18,14 +18,16 @@ namespace BirdsEye {
         /// Set to the NES joypad by default. <br/>
         ///</summary>
         public void SetJoypad(string newJoypad) {
-            _log.Write(1, $"Changing joypad layout to {newJoypad}.");
-            _joypad = newJoypad switch {
-                "NES" => new NESJoypad(),
-                "GB(C)" => new GBAndGBCJoypad(),
-                "SNES" => new SNESJoypad(),
-                "NDS" => new NDSJoypad(),
-                _ => _joypad
-            };
+            if (newJoypad != _joypad.Name) {
+                _log.Write(1, $"Changing joypad layout to {newJoypad}.");
+                _joypad = newJoypad switch {
+                    "NES" => new NESJoypad(),
+                    "GB(C)" => new GBAndGBCJoypad(),
+                    "SNES" => new SNESJoypad(),
+                    "NDS" => new NDSJoypad(),
+                    _ => _joypad
+                };
+            }
         }
 
         ///<summary>

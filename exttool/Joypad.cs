@@ -2,6 +2,7 @@ using System.Collections.Generic;
 
 namespace BirdsEye {
     public class Joypad {
+        public string? Name;
         public IDictionary<string, bool>? Controls;
         public IDictionary<string, int?>? ControlsAnalog;
         public int? DefaultController;
@@ -9,6 +10,7 @@ namespace BirdsEye {
 
     public class NESJoypad : Joypad {
         public NESJoypad() {
+            Name = "NES";
             Controls = new Dictionary<string, bool>() {
                 {"A", false}, {"B", false}, {"Up", false}, {"Down", false}, {"Right", false},
                 {"Left", false}, {"Select", false}, {"Start", false},
@@ -19,6 +21,7 @@ namespace BirdsEye {
 
     public class GBAndGBCJoypad : Joypad {
         public GBAndGBCJoypad() {
+            Name = "GB(C)";
             Controls = new Dictionary<string, bool>() {
                 {"A", false}, {"B", false}, {"Up", false}, {"Down", false}, {"Right", false},
                 {"Left", false}, {"Select", false}, {"Start", false},
@@ -29,6 +32,7 @@ namespace BirdsEye {
 
     public class SNESJoypad : Joypad {
         public SNESJoypad() {
+            Name = "SNES";
             Controls = new Dictionary<string, bool>() {
                 {"A", false}, {"B", false}, {"L", false}, {"R", false}, {"X", false}, {"Y", false},
                 {"Up", false}, {"Down", false}, {"Right", false}, {"Left", false},
@@ -40,6 +44,7 @@ namespace BirdsEye {
 
     public class NDSJoypad : Joypad {
         public NDSJoypad() {
+            Name = "NDS";
             Controls = new Dictionary<string, bool>() {
                 {"A", false}, {"B", false}, {"L", false}, {"R", false}, {"X", false}, {"Y", false},
                 {"Up", false}, {"Down", false}, {"Right", false}, {"Left", false},
