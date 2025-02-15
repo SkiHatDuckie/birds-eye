@@ -16,9 +16,8 @@ namespace BirdsEye {
         ///<summary>
         /// Sets the joypad layout to be used when setting inputs. <br/>
         /// Set to the NES joypad by default. <br/>
-        /// Returns nothing as a response.
         ///</summary>
-        public Response SetJoypad(string newJoypad) {
+        public void SetJoypad(string newJoypad) {
             _log.Write(1, $"Changing joypad layout to {newJoypad}.");
             _joypad = newJoypad switch {
                 "NES" => new NESJoypad(),
@@ -27,7 +26,6 @@ namespace BirdsEye {
                 "NDS" => new NDSJoypad(),
                 _ => _joypad
             };
-            return new Response("");
         }
 
         ///<summary>
@@ -49,14 +47,15 @@ namespace BirdsEye {
         ///</summary>
         public Response SetInputFromString(string str) {
             string[] newState = str.Trim(';').Split(';');
+            SetJoypad(newState[0]);
             string key;
-            for (int i = 0; i < newState.Length; i++) {
-                if (i <= _joypad.Controls!.Count) {
+            for (int i = 0; i < newState.Length - 1; i++) {
+                if (i < _joypad.Controls!.Count) {
                     key = _joypad.Controls.ElementAt(i).Key;
-                    _joypad.Controls[key] = Convert.ToBoolean(newState[i]);
+                    _joypad.Controls[key] = Convert.ToBoolean(newState[i + 1]);
                 } else {
                     key = _joypad.ControlsAnalog.ElementAt(i).Key;
-                    _joypad.ControlsAnalog![key] = Convert.ToInt32(newState[i]);
+                    _joypad.ControlsAnalog![key] = Convert.ToInt32(newState[i + 1]);
                 }
             }
             return new Response("");

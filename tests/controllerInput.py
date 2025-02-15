@@ -15,10 +15,8 @@ if __name__ == "__main__":
 
     # Set the joypad to use, and set it to hold right
     joypad = bird.SNESJoypad()
-    joypad_config = bird.controllerInput.JoypadConfig(client, joypad)
     controller_input = bird.controllerInput.ControllerInputs(client, joypad)
     controller_input.joypad.controls["Right"] = True
-    joypad_config.queue()
     controller_input.queue()
 
     # Set commandeer mode to true from the script.
